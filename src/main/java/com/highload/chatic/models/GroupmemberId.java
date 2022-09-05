@@ -7,11 +7,11 @@ import java.util.Objects;
 @Embeddable
 public class GroupmemberId implements Serializable {
     @ManyToOne
-    @JoinColumn(name = "pgroup", insertable = false, updatable = false)
+    @JoinColumn(name = "pgroup")
     private Pgroup pgroup;
 
     @ManyToOne
-    @JoinColumn(name = "person", insertable = false, updatable = false)
+    @JoinColumn(name = "person")
     private Person person;
 
     public Pgroup getPgroup() {

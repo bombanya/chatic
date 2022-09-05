@@ -7,11 +7,11 @@ import java.util.Objects;
 @Embeddable
 public class ReactionId implements Serializable {
     @ManyToOne
-    @JoinColumn(name = "message", insertable = false, updatable = false)
+    @JoinColumn(name = "message")
     private Message message;
 
     @ManyToOne
-    @JoinColumn(name = "message", insertable = false, updatable = false)
+    @JoinColumn(name = "person")
     private Person person;
 
     public Message getMessage() {
