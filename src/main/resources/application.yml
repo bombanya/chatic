@@ -4,11 +4,10 @@ spring:
     url: jdbc:postgresql://localhost:5432/chatic
     username: postgres
     password: postgres
+
   jpa:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         show_sql: true
         ddl-auto: none
-  liquibase:
-    changeLog: "classpath:db/changelog/db.changelog-master.sql"
