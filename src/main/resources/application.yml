@@ -1,13 +1,16 @@
 spring:
   datasource:
     driverClassName: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/chatic
-    username: postgres
-    password: postgres
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:chatic}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
 
   jpa:
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+        dialect: org.hibernate.dialect.PostgreSQL10Dialect
         show_sql: true
-        ddl-auto: none
+        hbm2ddl:
+          auto: validate
+    show-sql: true
+    generate-ddl: false
