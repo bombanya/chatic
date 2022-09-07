@@ -1,15 +1,15 @@
 package com.highload.chatic.models;
 
+import com.highload.chatic.security.AuthRole;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
 import java.util.UUID;
 
 @Entity
 @Table (name = "authrole")
-public class AuthRole {
+public class AuthRoleEntity {
     @Id
     @Column(name = "id")
     @GeneratedValue(generator = "uuid")
@@ -18,8 +18,8 @@ public class AuthRole {
 
     @Column(name = "name", unique = true)
     @NotEmpty(message = "Имя не должно быть пустым")
-    @Size(min = 2, max = 20, message = "Имя должно быть от 2 до 20 символов длиной")
-    private String name;
+    @Enumerated(EnumType.STRING)
+    private AuthRole name;
 
     public UUID getId() {
         return id;
@@ -29,11 +29,11 @@ public class AuthRole {
         this.id = id;
     }
 
-    public String getName() {
+    public AuthRole getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(AuthRole name) {
         this.name = name;
     }
 }

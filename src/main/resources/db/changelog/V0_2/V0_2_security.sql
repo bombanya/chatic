@@ -1,7 +1,7 @@
 --liquibase formatted sql
 
 --changeset bombanya:10
-ALTER TABLE Person ADD COLUMN password varchar(20) NOT NULL;
+ALTER TABLE Person ADD COLUMN password text NOT NULL;
 --rollback ALTER TABLE person DROP COLUMN password;
 
 --changeset bombanya:11

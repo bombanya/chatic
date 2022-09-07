@@ -4,9 +4,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Table(name = "person", schema = "public", catalog = "chatic")
@@ -24,7 +22,6 @@ public class Person {
 
     @Column(name = "password")
     @NotEmpty(message = "Пароль не должен быть пустым")
-    @Size(max = 20, message = "Пароль не должен превышать 20 символов")
     private String password;
 
     @Column(name = "bio")
@@ -36,6 +33,21 @@ public class Person {
 
     @OneToMany(mappedBy = "author")
     private List<Message> messages;
+
+    @ManyToMany
+    @JoinTable(name = "personroles",
+            joinColumns = @JoinColumn(name = "person_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<AuthRoleEntity> authRoles = new HashSet<>();
+
+    public Set<AuthRoleEntity> getAuthRoles() {
+        return authRoles;
+    }
+
+    public void setAuthRoles(Set<AuthRoleEntity> authRoles) {
+        this.authRoles = authRoles;
+    }
+
 
     public UUID getId() {
         return id;
