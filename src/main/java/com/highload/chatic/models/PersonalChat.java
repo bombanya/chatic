@@ -2,13 +2,11 @@ package com.highload.chatic.models;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
-import java.util.Objects;
-import java.util.UUID;
 
 @Entity
 @Table(name = "personalchat", schema = "public", catalog = "chatic")
 @PrimaryKeyJoinColumn(name = "id")
-public class Personalchat extends Chat {
+public class PersonalChat extends Chat {
     @ManyToOne
     @JoinColumn(name = "person1", referencedColumnName = "id")
     @NotEmpty(message = "Не указан участник (1) чата")

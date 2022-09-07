@@ -1,11 +1,11 @@
 package com.highload.chatic.models;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import java.sql.Timestamp;
-import java.util.Objects;
 import java.util.UUID;
 
 @Entity
@@ -13,7 +13,8 @@ import java.util.UUID;
 public class Message {
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid2")
     private UUID id;
 
     @ManyToOne

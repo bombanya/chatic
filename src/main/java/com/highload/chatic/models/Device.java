@@ -1,5 +1,7 @@
 package com.highload.chatic.models;
 
+import org.hibernate.annotations.GenericGenerator;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import java.util.UUID;
@@ -9,7 +11,8 @@ import java.util.UUID;
 public class Device {
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid2")
     private UUID id;
 
     @ManyToOne
