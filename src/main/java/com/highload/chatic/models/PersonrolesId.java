@@ -2,8 +2,6 @@ package com.highload.chatic.models;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Objects;
-import java.util.UUID;
 
 @Embeddable
 public class PersonrolesId implements Serializable {
@@ -13,7 +11,7 @@ public class PersonrolesId implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "role_id")
-    private Authrole roleId;
+    private AuthRole roleId;
 
     public Person getPersonId() {
         return personId;
@@ -23,11 +21,11 @@ public class PersonrolesId implements Serializable {
         this.personId = personId;
     }
 
-    public Authrole getRoleId() {
+    public AuthRole getRoleId() {
         return roleId;
     }
 
-    public void setRoleId(Authrole roleId) {
+    public void setRoleId(AuthRole roleId) {
         this.roleId = roleId;
     }
 }

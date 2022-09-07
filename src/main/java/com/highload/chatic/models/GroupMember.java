@@ -1,23 +1,22 @@
 package com.highload.chatic.models;
 
 import javax.persistence.*;
-import java.util.Objects;
 
 @Entity
 @Table(name = "groupmember", schema = "public", catalog = "chatic")
-public class Groupmember {
+public class GroupMember {
     @EmbeddedId
-    private GroupmemberId groupmemberId;
+    private GroupMemberId groupmemberId;
 
     @ManyToOne
     @JoinColumn(name = "role", referencedColumnName = "id")
-    private Grouprole role;
+    private GroupRole role;
 
-    public Pgroup getPgroup() {
+    public PGroup getPgroup() {
         return groupmemberId.getPgroup();
     }
 
-    public void setPgroup(Pgroup pgroup) {
+    public void setPgroup(PGroup pgroup) {
         groupmemberId.setPgroup(pgroup);
     }
 
@@ -29,11 +28,11 @@ public class Groupmember {
         groupmemberId.setPerson(person);
     }
 
-    public Grouprole getRole() {
+    public GroupRole getRole() {
         return role;
     }
 
-    public void setRole(Grouprole role) {
+    public void setRole(GroupRole role) {
         this.role = role;
     }
 }

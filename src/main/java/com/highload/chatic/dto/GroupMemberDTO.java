@@ -1,23 +1,23 @@
 package com.highload.chatic.dto;
 
-import com.highload.chatic.models.GroupmemberId;
-import com.highload.chatic.models.Grouprole;
+import com.highload.chatic.models.GroupMemberId;
+import com.highload.chatic.models.GroupRole;
 import com.highload.chatic.models.Person;
-import com.highload.chatic.models.Pgroup;
+import com.highload.chatic.models.PGroup;
 
 import javax.persistence.EmbeddedId;
 
-public class GroupmemberDTO {
+public class GroupMemberDTO {
     @EmbeddedId
-    private GroupmemberId groupmemberId;
+    private GroupMemberId groupmemberId;
 
-    private Grouprole role;
+    private GroupRole role;
 
-    public Pgroup getPgroup() {
+    public PGroup getPgroup() {
         return groupmemberId.getPgroup();
     }
 
-    public void setPgroup(Pgroup pgroup) {
+    public void setPgroup(PGroup pgroup) {
         groupmemberId.setPgroup(pgroup);
     }
 
@@ -29,11 +29,11 @@ public class GroupmemberDTO {
         groupmemberId.setPerson(person);
     }
 
-    public Grouprole getRole() {
+    public GroupRole getRole() {
         return role;
     }
 
-    public void setRole(Grouprole role) {
+    public void setRole(GroupRole role) {
         this.role = role;
     }
 }

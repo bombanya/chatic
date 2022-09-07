@@ -4,7 +4,7 @@ import com.highload.chatic.models.Person;
 
 import javax.validation.constraints.NotEmpty;
 
-public class PersonalchatDTO {
+public class PersonalChatDTO {
     @NotEmpty(message = "Не указан участник (2) чата")
     private Person person2;
 

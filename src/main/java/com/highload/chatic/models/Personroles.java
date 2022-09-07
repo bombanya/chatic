@@ -1,8 +1,6 @@
 package com.highload.chatic.models;
 
 import javax.persistence.*;
-import java.util.Objects;
-import java.util.UUID;
 
 @Entity
 @Table(name = "personroles")
@@ -18,11 +16,11 @@ public class Personroles {
         personrolesId.setPersonId(personId);
     }
 
-    public Authrole getRoleId() {
+    public AuthRole getRoleId() {
         return personrolesId.getRoleId();
     }
 
-    public void setRoleId(Authrole roleId) {
+    public void setRoleId(AuthRole roleId) {
         personrolesId.setRoleId(roleId);
     }
 }

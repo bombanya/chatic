@@ -5,12 +5,11 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
-import java.util.Objects;
 import java.util.UUID;
 
 @Entity
 @Table (name = "authrole")
-public class Authrole {
+public class AuthRole {
     @Id
     @Column(name = "id")
     @GeneratedValue(generator = "uuid")

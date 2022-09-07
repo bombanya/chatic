@@ -1,12 +1,12 @@
 package com.highload.chatic.dto;
 
-import com.highload.chatic.models.Authrole;
+import com.highload.chatic.models.AuthRole;
 import com.highload.chatic.models.Person;
 import com.highload.chatic.models.PersonrolesId;
 
 import javax.persistence.EmbeddedId;
 
-public class PersonrolesDTO {
+public class PersonRolesDTO {
     @EmbeddedId
     private PersonrolesId personrolesId;
 
@@ -18,11 +18,11 @@ public class PersonrolesDTO {
         personrolesId.setPersonId(personId);
     }
 
-    public Authrole getRoleId() {
+    public AuthRole getRoleId() {
         return personrolesId.getRoleId();
     }
 
-    public void setRoleId(Authrole roleId) {
+    public void setRoleId(AuthRole roleId) {
         personrolesId.setRoleId(roleId);
     }
 }

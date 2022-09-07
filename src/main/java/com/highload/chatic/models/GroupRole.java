@@ -4,12 +4,11 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
-import java.util.Objects;
 import java.util.UUID;
 
 @Entity
 @Table(name = "grouprole", schema = "public", catalog = "chatic")
-public class Grouprole {
+public class GroupRole {
     @Id
     @Column(name = "id")
     @GeneratedValue(generator = "uuid")
