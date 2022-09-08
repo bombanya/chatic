@@ -1,4 +1,4 @@
-package com.highload.chatic.security;
+package com.highload.chatic.security.filters;
 
 import com.highload.chatic.util.JwtUtil;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,8 +30,6 @@ public class JwtVerifyFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-
-        System.out.println("filter");
 
         SecurityContextHolder.getContext()
                 .setAuthentication(jwtUtil.parseToken(authHeader));

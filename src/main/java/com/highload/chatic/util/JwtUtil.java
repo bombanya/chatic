@@ -7,17 +7,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Map;
 
 @Component
 public class JwtUtil {
 
-    @Value("${jwt.key")
+    @Value("${jwt.secret}")
     private String jwtKey;
 
     public String generateToken(Authentication authentication) {
@@ -37,9 +35,9 @@ public class JwtUtil {
                 .parseClaimsJws(token)
                 .getBody();
         String username = claims.getSubject();
-        List<SimpleGrantedAuthority> grantedAuthorities = ((List<Map<String, String>>) claims.get("authorities"))
+        List<SimpleGrantedAuthority> grantedAuthorities = ((List<String>) claims.get("authorities"))
                 .stream()
-                .map(m -> new SimpleGrantedAuthority(m.get("authority")))
+                .map(SimpleGrantedAuthority::new)
                 .toList();
 
         return new UsernamePasswordAuthenticationToken(

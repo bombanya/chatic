@@ -1,71 +1,57 @@
 package com.highload.chatic.security;
 
-import com.highload.chatic.dao.PersonRepo;
+import com.highload.chatic.data.persistence.repository.PersonRepository;
 import com.highload.chatic.models.Person;
+import com.highload.chatic.security.filters.JwtAuthFilter;
+import com.highload.chatic.security.filters.JwtVerifyFilter;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import javax.annotation.PostConstruct;
+import java.util.List;
 
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(jsr250Enabled = true)
-public class SecurityConfig {
+@EnableGlobalMethodSecurity(jsr250Enabled = true, prePostEnabled = true)
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final PersonRepo personRepo;
     private final JwtVerifyFilter jwtVerifyFilter;
+    private final PersonRepository personRepository;
 
-    public SecurityConfig(PersonRepo personRepo, JwtVerifyFilter jwtVerifyFilter) {
-        this.personRepo = personRepo;
+    public SecurityConfig(JwtVerifyFilter jwtVerifyFilter, PersonRepository personRepository) {
         this.jwtVerifyFilter = jwtVerifyFilter;
+        this.personRepository = personRepository;
     }
 
-    @Bean
-    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
-        return http.getSharedObject(AuthenticationManagerBuilder.class)
-                .userDetailsService(
-                        username -> personRepo
-                                .findByUsername(username)
-                                .map(this::personToUserDetails)
-                                .orElseThrow(() ->{
-                                            System.out.println("here");
-                                            throw new UsernameNotFoundException("User " + username + " not found");
-                                }
-                                        ))
-                .passwordEncoder(passwordEncoder())
-                .and()
-                .build();
-    }
-
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
         http
                 .cors()
                 .and()
                 .csrf().disable()
                 .sessionManagement()
-                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                //.addFilterBefore(jwtVerifyFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilter(jwtAuthFilter())
+                .addFilterAfter(jwtVerifyFilter, JwtAuthFilter.class)
                 .authorizeRequests()
-                .antMatchers("/login").permitAll()
+                .antMatchers("login").permitAll()
                 .anyRequest().authenticated();
+    }
 
-        return http.build();
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) {
+        auth.authenticationProvider(daoAuthenticationProvider());
     }
 
     @Bean
@@ -73,23 +59,34 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+    @Override
     @Bean
-    public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
+    protected AuthenticationManager authenticationManager() throws Exception {
+        return super.authenticationManager();
+    }
+
+    @Bean
+    public DaoAuthenticationProvider daoAuthenticationProvider(){
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setPasswordEncoder(passwordEncoder());
+        provider.setUserDetailsService(username -> personRepository
+                .findByUsername(username)
+                .map(this::personToUserDetails)
+                .orElseThrow(() ->
+                        new UsernameNotFoundException("User " + username + " not found")));
+        return provider;
+    }
+
+    @Bean
+    public JwtAuthFilter jwtAuthFilter() {
+        return new JwtAuthFilter();
     }
 
     private UserDetails personToUserDetails(Person person) {
         return User.builder()
                 .username(person.getUsername())
                 .password(person.getPassword())
-                .authorities(person.getAuthRoles()
-                        .stream()
-                        .map(authRoleEntity ->
-                                new SimpleGrantedAuthority("ROLE_" + authRoleEntity
-                                        .getName()
-                                        .name()))
-                        .toList())
+                .authorities(List.of(person.getAuthRole()))
                 .build();
     }
 }
