@@ -15,7 +15,7 @@ import java.util.List;
 @Component
 public class JwtUtil {
 
-    @Value("val")
+    @Value("${jwt.secret}")
     private String jwtKey;
 
     public String generateToken(Authentication authentication) {
