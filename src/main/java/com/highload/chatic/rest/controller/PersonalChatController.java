@@ -1,12 +1,11 @@
-package com.highload.chatic.rest.controller.personalchat;
+package com.highload.chatic.rest.controller;
 
 import com.highload.chatic.dto.message.MessagePageResponseDto;
 import com.highload.chatic.dto.personalchat.PersonalChatPageResponseDto;
 import com.highload.chatic.dto.personalchat.PersonalChatRequestDto;
 import com.highload.chatic.dto.personalchat.PersonalChatResponseDto;
 import com.highload.chatic.exception.ResourceNotFoundException;
-import com.highload.chatic.models.PersonalChat;
-import com.highload.chatic.rest.service.PersonalChatService;
+import com.highload.chatic.service.PersonalChatService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;

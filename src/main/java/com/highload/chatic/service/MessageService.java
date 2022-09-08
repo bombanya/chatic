@@ -1,4 +1,4 @@
-package com.highload.chatic.rest.service;
+package com.highload.chatic.service;
 
 import com.highload.chatic.dto.message.MessagePageResponseDto;
 import com.highload.chatic.dto.message.MessageRequestDto;

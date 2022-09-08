@@ -1,30 +1,29 @@
-package com.highload.chatic.data.persistence.service;
+package com.highload.chatic.service.impls;
 
-import com.highload.chatic.data.persistence.repository.PersonRepository;
+import com.highload.chatic.models.Person;
+import com.highload.chatic.repository.PersonRepository;
 import com.highload.chatic.dto.person.PersonPageResponseDto;
 import com.highload.chatic.dto.person.PersonRequestDto;
 import com.highload.chatic.dto.person.PersonResponseDto;
 import com.highload.chatic.exception.IllegalAccessException;
 import com.highload.chatic.exception.ResourceNotFoundException;
-import com.highload.chatic.models.Device;
-import com.highload.chatic.rest.service.PersonService;
+import com.highload.chatic.service.PersonService;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class PersonServiceImpl implements PersonService {
 
     private final PersonRepository personRepository;
     private final ModelMapper modelMapper;
-
-    public PersonServiceImpl(PersonRepository personRepository, ModelMapper modelMapper) {
-        this.personRepository = personRepository;
-        this.modelMapper = modelMapper;
-    }
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public PersonResponseDto getPerson(UUID personId) throws ResourceNotFoundException {
@@ -41,13 +40,13 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
-    public PersonPageResponseDto getPersons(UserDetails userDetails, Pageable pageable) {
-        //TODO
-        return null;
+    public void registerNewPerson(PersonRequestDto personRequestDto) {
+        personRequestDto.setPassword(passwordEncoder.encode(personRequestDto.getPassword()));
+        personRepository.save(modelMapper.map(personRequestDto, Person.class));
     }
 
     @Override
-    public PersonResponseDto addPerson(UserDetails userDetails, PersonRequestDto person) {
+    public PersonPageResponseDto getPersons(UserDetails userDetails, Pageable pageable) {
         //TODO
         return null;
     }

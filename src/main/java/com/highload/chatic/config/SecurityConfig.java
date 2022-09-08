@@ -1,6 +1,6 @@
-package com.highload.chatic.security;
+package com.highload.chatic.config;
 
-import com.highload.chatic.data.persistence.repository.PersonRepository;
+import com.highload.chatic.repository.PersonRepository;
 import com.highload.chatic.models.Person;
 import com.highload.chatic.security.filters.JwtAuthFilter;
 import com.highload.chatic.security.filters.JwtVerifyFilter;
