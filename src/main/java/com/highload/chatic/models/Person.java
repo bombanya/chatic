@@ -1,6 +1,7 @@
 package com.highload.chatic.models;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
@@ -31,9 +32,12 @@ public class Person {
     @Size(max = 70, message = "Поле должно быть до 70 символов длиной")
     private String bio;
 
+    @Column(name = "auth_role")
+    @Enumerated(EnumType.STRING)
+    private AuthRoleName authRole;
+
 //    @OneToMany(mappedBy = "person")
 //    private List<Device> devices;
-
     public Person(String username, String password, String bio) {
         this.username = username;
         this.password = password;
@@ -73,6 +77,14 @@ public class Person {
 
     public void setBio(String bio) {
         this.bio = bio;
+    }
+
+    public AuthRoleName getAuthRole() {
+        return authRole;
+    }
+
+    public void setAuthRole(AuthRoleName authRole) {
+        this.authRole = authRole;
     }
 
 //    public List<Device> getDevices() {
