@@ -1,3 +1,4 @@
+/*
 package com.highload.chatic.rest.controller;
 
 import com.highload.chatic.exception.IllegalAccessException;
@@ -75,3 +76,4 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         }
     }
 }
+*/
