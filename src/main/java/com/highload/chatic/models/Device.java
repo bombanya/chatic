@@ -4,6 +4,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
 @Entity
@@ -21,7 +22,7 @@ public class Device {
 //    private Person person;
 
     @Column(name = "person")
-    @NotEmpty(message = "Необходимо указание владельца")
+    @NotNull(message = "Необходимо указание владельца")
     private UUID personId;
 
     @Column(name = "geo")

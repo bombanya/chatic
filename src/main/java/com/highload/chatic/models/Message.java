@@ -5,6 +5,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.UUID;
@@ -24,7 +25,7 @@ public class Message {
 //    private Chat chat;
 
     @Column(name = "chat")
-    @NotEmpty(message = "Не указан чат для сообщения")
+    @NotNull(message = "Не указан чат для сообщения")
     private UUID chatId;
 
 //    @ManyToOne
@@ -32,12 +33,12 @@ public class Message {
 //    private Person author;
 
     @Column(name = "author")
-    @NotEmpty(message = "Не указан отправитель сообщения")
+    @NotNull(message = "Не указан отправитель сообщения")
     private UUID authorId;
 
     @CreationTimestamp
     @Column(name = "timestamp")
-    @NotEmpty(message = "врем метка")
+    @NotNull(message = "врем метка")
     private Timestamp timestamp;
 
 //    @ManyToOne

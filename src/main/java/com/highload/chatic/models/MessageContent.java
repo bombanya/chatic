@@ -4,6 +4,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
 @Entity
@@ -17,6 +18,7 @@ public class MessageContent {
     private UUID id;
 
     @Column(name = "message_id")
+    @NotNull
     private UUID messageId;
 
     @NotEmpty

@@ -2,6 +2,7 @@ package com.highload.chatic.models;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
 @Entity
@@ -14,7 +15,7 @@ public class PersonalChat extends Chat {
 //    private Person person1;
 
     @Column(name = "person1")
-    @NotEmpty(message = "Не указан участник (1) чата")
+    @NotNull(message = "Не указан участник (1) чата")
     private UUID person1Id;
 
 //    @ManyToOne
@@ -23,7 +24,7 @@ public class PersonalChat extends Chat {
 //    private Person person2;
 
     @Column(name = "person2")
-    @NotEmpty(message = "Не указан участник (2) чата")
+    @NotNull(message = "Не указан участник (2) чата")
     private UUID person2Id;
 
     public PersonalChat(UUID person1Id, UUID person2Id) {

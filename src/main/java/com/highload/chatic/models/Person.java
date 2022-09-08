@@ -25,7 +25,6 @@ public class Person {
 
     @Column(name = "password")
     @NotEmpty(message = "Пароль не должен быть пустым")
-    @Size(max = 20, message = "Пароль не должен превышать 20 символов")
     private String password;
 
     @Column(name = "bio")
