@@ -3,7 +3,6 @@ package com.highload.chatic.models;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
 import java.util.UUID;
 
 @Entity
@@ -16,15 +15,12 @@ public class GroupRole {
     private UUID id;
 
     @Column(name = "write_posts")
-    @NotEmpty(message = "Укажите права")
     private boolean writePosts;
 
     @Column(name = "write_comments")
-    @NotEmpty(message = "Укажите права")
     private boolean writeComments;
 
     @Column(name = "manage_members")
-    @NotEmpty(message = "Укажите права")
     private boolean manageMembers;
 
     public GroupRole(boolean writePosts, boolean writeComments, boolean manageMembers) {
