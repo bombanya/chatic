@@ -27,6 +27,15 @@ public class GroupRole {
     @NotEmpty(message = "Укажите права")
     private boolean manageMembers;
 
+    public GroupRole(boolean writePosts, boolean writeComments, boolean manageMembers) {
+        this.writePosts = writePosts;
+        this.writeComments = writeComments;
+        this.manageMembers = manageMembers;
+    }
+
+    protected GroupRole() {
+    }
+
     public UUID getId() {
         return id;
     }
@@ -58,4 +67,5 @@ public class GroupRole {
     public void setManageMembers(boolean manageMembers) {
         this.manageMembers = manageMembers;
     }
+
 }

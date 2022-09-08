@@ -16,8 +16,15 @@ public class Chat {
     @GenericGenerator(name = "uuid", strategy = "uuid2")
     private UUID id;
 
-    @OneToMany(mappedBy = "chat")
-    private List<Message> messages;
+//    @OneToMany(mappedBy = "chat")
+//    private List<Message> messages;
+
+    public Chat(UUID id) {
+        this.id = id;
+    }
+
+    protected Chat() {
+    }
 
     public UUID getId() {
         return id;
@@ -26,4 +33,12 @@ public class Chat {
     public void setId(UUID id) {
         this.id = id;
     }
+
+    /*public List<Message> getMessages() {
+        return messages;
+    }
+
+    public void setMessages(List<Message> messages) {
+        this.messages = messages;
+    }*/
 }

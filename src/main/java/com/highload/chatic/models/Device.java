@@ -15,10 +15,14 @@ public class Device {
     @GenericGenerator(name = "uuid", strategy = "uuid2")
     private UUID id;
 
-    @ManyToOne
-    @JoinColumn(name = "person", referencedColumnName = "id")
+//    @ManyToOne
+//    @JoinColumn(name = "person", referencedColumnName = "id")
+//    @NotEmpty(message = "Необходимо указание владельца")
+//    private Person person;
+
+    @Column(name = "person")
     @NotEmpty(message = "Необходимо указание владельца")
-    private Person person;
+    private UUID personId;
 
     @Column(name = "geo")
     @NotEmpty(message = "Нет указания места")
@@ -28,6 +32,15 @@ public class Device {
     @NotEmpty(message = "Нет указания mac-адреса")
     private String mac;
 
+    public Device(UUID personId, String geo, String mac) {
+        this.personId = personId;
+        this.geo = geo;
+        this.mac = mac;
+    }
+
+    protected Device() {
+    }
+
     public UUID getId() {
         return id;
     }
@@ -36,13 +49,13 @@ public class Device {
         this.id = id;
     }
 
-    public Person getPerson() {
-        return person;
-    }
+//    public Person getPerson() {
+//        return person;
+//    }
 
-    public void setPerson(Person person) {
-        this.person = person;
-    }
+//    public void setPerson(Person person) {
+//        this.person = person;
+//    }
 
     public String getGeo() {
         return geo;
@@ -58,5 +71,13 @@ public class Device {
 
     public void setMac(String mac) {
         this.mac = mac;
+    }
+
+    public UUID getPersonId() {
+        return personId;
+    }
+
+    public void setPersonId(UUID personId) {
+        this.personId = personId;
     }
 }

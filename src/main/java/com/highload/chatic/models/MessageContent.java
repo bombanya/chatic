@@ -1,4 +1,4 @@
-package com.highload.chatic.data.persistence.model;
+package com.highload.chatic.models;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -16,12 +16,19 @@ public class MessageContent {
     @GenericGenerator(name = "uuid", strategy = "uuid2")
     private UUID id;
 
-    @OneToOne
-    @JoinColumn(name = "message_id", referencedColumnName = "id")
-    private Message message;
+    @Column(name = "message_id")
+    private UUID messageId;
 
     @NotEmpty
     private String text;
+
+    public MessageContent(UUID messageId, String text) {
+        this.messageId = messageId;
+        this.text = text;
+    }
+
+    protected MessageContent() {
+    }
 
     public UUID getId() {
         return id;
@@ -31,19 +38,19 @@ public class MessageContent {
         this.id = id;
     }
 
-    public Message getMessage() {
-        return message;
-    }
-
-    public void setMessage(Message message) {
-        this.message = message;
-    }
-
     public String getText() {
         return text;
     }
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public UUID getMessageId() {
+        return messageId;
+    }
+
+    public void setMessageId(UUID messageId) {
+        this.messageId = messageId;
     }
 }

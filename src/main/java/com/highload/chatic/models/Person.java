@@ -3,7 +3,8 @@ package com.highload.chatic.models;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -31,11 +32,17 @@ public class Person {
     @Size(max = 70, message = "Поле должно быть до 70 символов длиной")
     private String bio;
 
-    @OneToMany(mappedBy = "person")
-    private List<Device> devices;
+//    @OneToMany(mappedBy = "person")
+//    private List<Device> devices;
 
-    @OneToMany(mappedBy = "author")
-    private List<Message> messages;
+    public Person(String username, String password, String bio) {
+        this.username = username;
+        this.password = password;
+        this.bio = bio;
+    }
+
+    protected Person() {
+    }
 
     public UUID getId() {
         return id;
@@ -68,6 +75,14 @@ public class Person {
     public void setBio(String bio) {
         this.bio = bio;
     }
+
+//    public List<Device> getDevices() {
+//        return devices;
+//    }
+
+//    public void setDevices(List<Device> devices) {
+//        this.devices = devices;
+//    }
 
     @Override
     public boolean equals(Object o) {
