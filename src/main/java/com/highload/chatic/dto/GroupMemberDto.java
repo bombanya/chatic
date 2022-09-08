@@ -7,13 +7,13 @@ import com.highload.chatic.models.PGroup;
 
 import javax.persistence.EmbeddedId;
 
-public class GroupMemberDTO {
+public class GroupMemberDto {
     @EmbeddedId
     private GroupMemberId groupmemberId;
 
     private GroupRole role;
 
-    public PGroup getPgroup() {
+    /*public PGroup getPgroup() {
         return groupmemberId.getPgroup();
     }
 
@@ -27,7 +27,7 @@ public class GroupMemberDTO {
 
     public void setPerson(Person person) {
         groupmemberId.setPerson(person);
-    }
+    }*/
 
     public GroupRole getRole() {
         return role;
