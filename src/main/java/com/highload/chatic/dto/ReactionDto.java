@@ -8,7 +8,7 @@ import javax.persistence.EmbeddedId;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
-public class ReactionDTO {
+public class ReactionDto {
     @EmbeddedId
     private ReactionId reactionId;
 
@@ -16,7 +16,7 @@ public class ReactionDTO {
     @NotEmpty(message = "Нет реакции")
     private String emoji;
 
-    public Message getMessage() {
+    /*public Message getMessage() {
         return reactionId.getMessage();
     }
 
@@ -30,7 +30,7 @@ public class ReactionDTO {
 
     public void setPerson(Person person) {
         reactionId.setPerson(person);
-    }
+    }*/
 
     public String getEmoji() {
         return emoji;

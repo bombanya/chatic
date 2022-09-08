@@ -1,20 +1,37 @@
 package com.highload.chatic.models;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import java.io.Serializable;
-import java.util.Objects;
+import java.util.UUID;
 
 @Embeddable
 public class ReactionId implements Serializable {
-    @ManyToOne
-    @JoinColumn(name = "message")
-    private Message message;
+//    @ManyToOne
+//    @JoinColumn(name = "message")
+//    private Message message;
 
-    @ManyToOne
-    @JoinColumn(name = "person")
-    private Person person;
+    @Column(name = "message")
+    private UUID messageId;
 
-    public Message getMessage() {
+//    @ManyToOne
+//    @JoinColumn(name = "person")
+//    private Person person;
+
+    @Column(name = "person")
+    private UUID personId;
+
+    public ReactionId(UUID messageId, UUID personId) {
+        this.messageId = messageId;
+        this.personId = personId;
+    }
+
+    protected ReactionId() {
+    }
+
+    /*public Message getMessage() {
         return message;
     }
 
@@ -28,5 +45,21 @@ public class ReactionId implements Serializable {
 
     public void setPerson(Person person) {
         this.person = person;
+    }*/
+
+    public UUID getMessageId() {
+        return messageId;
+    }
+
+    public void setMessageId(UUID messageId) {
+        this.messageId = messageId;
+    }
+
+    public UUID getPersonId() {
+        return personId;
+    }
+
+    public void setPersonId(UUID personId) {
+        this.personId = personId;
     }
 }

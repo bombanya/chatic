@@ -3,8 +3,11 @@ package com.highload.chatic.models;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import javax.validation.constraints.*;
-import java.util.*;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 @Entity
 @Table(name = "person", schema = "public", catalog = "chatic")
@@ -22,32 +25,24 @@ public class Person {
 
     @Column(name = "password")
     @NotEmpty(message = "Пароль не должен быть пустым")
+    @Size(max = 20, message = "Пароль не должен превышать 20 символов")
     private String password;
 
     @Column(name = "bio")
     @Size(max = 70, message = "Поле должно быть до 70 символов длиной")
     private String bio;
 
-    @OneToMany(mappedBy = "person")
-    private List<Device> devices;
+//    @OneToMany(mappedBy = "person")
+//    private List<Device> devices;
 
-    @OneToMany(mappedBy = "author")
-    private List<Message> messages;
-
-    @ManyToMany
-    @JoinTable(name = "personroles",
-            joinColumns = @JoinColumn(name = "person_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<AuthRoleEntity> authRoles = new HashSet<>();
-
-    public Set<AuthRoleEntity> getAuthRoles() {
-        return authRoles;
+    public Person(String username, String password, String bio) {
+        this.username = username;
+        this.password = password;
+        this.bio = bio;
     }
 
-    public void setAuthRoles(Set<AuthRoleEntity> authRoles) {
-        this.authRoles = authRoles;
+    protected Person() {
     }
-
 
     public UUID getId() {
         return id;
@@ -80,6 +75,14 @@ public class Person {
     public void setBio(String bio) {
         this.bio = bio;
     }
+
+//    public List<Device> getDevices() {
+//        return devices;
+//    }
+
+//    public void setDevices(List<Device> devices) {
+//        this.devices = devices;
+//    }
 
     @Override
     public boolean equals(Object o) {
