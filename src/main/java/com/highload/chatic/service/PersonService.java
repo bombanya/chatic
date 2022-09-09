@@ -1,4 +1,4 @@
-package com.highload.chatic.rest.service;
+package com.highload.chatic.service;
 
 import com.highload.chatic.dto.person.PersonPageResponseDto;
 import com.highload.chatic.dto.person.PersonRequestDto;
@@ -16,9 +16,9 @@ public interface PersonService {
 
     PersonResponseDto getPerson(String username) throws ResourceNotFoundException;
 
-    PersonPageResponseDto getPersons(UserDetails userDetails, Pageable pageable);
+    void registerNewPerson(PersonRequestDto personRequestDto);
 
-    PersonResponseDto addPerson(UserDetails userDetails, PersonRequestDto person);
+    PersonPageResponseDto getPersons(UserDetails userDetails, Pageable pageable);
 
     void updatePerson(UserDetails userDetails, PersonRequestDto person) throws ResourceNotFoundException, com.highload.chatic.exception.IllegalAccessException;
 

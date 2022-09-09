@@ -1,6 +1,6 @@
-package com.highload.chatic.data.persistence.service;
+package com.highload.chatic.service.impls;
 
-import com.highload.chatic.data.persistence.repository.PersonalChatRepository;
+import com.highload.chatic.repository.PersonalChatRepository;
 import com.highload.chatic.dto.message.MessagePageResponseDto;
 import com.highload.chatic.dto.message.MessageRequestDto;
 import com.highload.chatic.dto.message.MessageResponseDto;
@@ -8,14 +8,12 @@ import com.highload.chatic.dto.personalchat.PersonalChatPageResponseDto;
 import com.highload.chatic.dto.personalchat.PersonalChatRequestDto;
 import com.highload.chatic.dto.personalchat.PersonalChatResponseDto;
 import com.highload.chatic.exception.IllegalAccessException;
-import com.highload.chatic.exception.InvalidRequestException;
 import com.highload.chatic.exception.ResourceNotFoundException;
 import com.highload.chatic.models.AuthRoleName;
-import com.highload.chatic.models.Message;
 import com.highload.chatic.models.PersonalChat;
-import com.highload.chatic.rest.service.MessageService;
-import com.highload.chatic.rest.service.PersonService;
-import com.highload.chatic.rest.service.PersonalChatService;
+import com.highload.chatic.service.MessageService;
+import com.highload.chatic.service.PersonService;
+import com.highload.chatic.service.PersonalChatService;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;

@@ -1,4 +1,4 @@
-package com.highload.chatic.data.persistence.repository;
+package com.highload.chatic.repository;
 
 import com.highload.chatic.models.Message;
 import org.springframework.data.domain.Page;

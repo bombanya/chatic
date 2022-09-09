@@ -1,24 +1,26 @@
 package com.highload.chatic.dto.person;
 
-import com.highload.chatic.dto.device.DeviceRequestDto;
+import com.highload.chatic.models.AuthRoleName;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-public record PersonRequestDto(
-        @NotEmpty(message = "Имя не должно быть пустым")
-        @Size(min = 2, max = 20, message = "Имя должно быть от 2 до 20 символов длиной")
-        String username,
+@Getter
+@Setter
+public class PersonRequestDto {
+    @NotEmpty(message = "Имя не должно быть пустым")
+    @Size(min = 2, max = 20, message = "Имя должно быть от 2 до 20 символов длиной")
+    private String username;
 
-        @NotEmpty(message = "Пароль не должен быть пустым")
-        @Size(max = 20, message = "Пароль не должен превышать 20 символов")
-        String password,
+    @NotEmpty(message = "Пароль не должен быть пустым")
+    private String password;
 
-        @Size(max = 70, message = "Поле должно быть до 70 символов длиной")
-        String bio,
+    @Size(max = 70, message = "Поле должно быть до 70 символов длиной")
+    private String bio;
 
-        @NotNull(message = "Необходимо указание владельца")
-        DeviceRequestDto device
-) {
+    @NotNull(message = "Должна быть указна роль")
+    private AuthRoleName authRole;
 }
