@@ -3,15 +3,17 @@ package com.highload.chatic.dto.message;
 import com.highload.chatic.models.Message;
 import com.highload.chatic.models.MessageContent;
 
+import java.sql.Timestamp;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public record MessageResponseDto(
         UUID id,
         UUID chatId,
         UUID authorId,
-        long timestamp,
+        Timestamp timestamp,
         UUID replyId,
         String textContent
 ) {
@@ -20,18 +22,20 @@ public record MessageResponseDto(
                 message.getId(),
                 message.getChatId(),
                 message.getAuthorId(),
-                message.getTimestamp().getTime(),
+                message.getTimestamp(),
                 message.getReplyId(),
                 content.getText()
         );
     }
 
     public static List<MessageResponseDto> fromMessagesWithContent(
-            Map<UUID, Message> messages, List<MessageContent> contents
+            List<Message> messages, List<MessageContent> contents
     ) {
-        return contents.stream().map(content -> {
-            var message = messages.get(content.getMessageId());
-            return MessageResponseDto.fromMessageWithContent(message, content);
-        }).toList();
+        var contentMap = contents
+                .stream()
+                .collect(Collectors.toMap(MessageContent::getMessageId, Function.identity()));
+        return messages.stream()
+                .map(message -> fromMessageWithContent(message, contentMap.get(message.getId())))
+                .toList();
     }
 }

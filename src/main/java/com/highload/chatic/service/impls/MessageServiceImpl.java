@@ -3,24 +3,22 @@ package com.highload.chatic.service.impls;
 import com.highload.chatic.dto.PageResponseDto;
 import com.highload.chatic.dto.message.MessageRequestDto;
 import com.highload.chatic.dto.message.MessageResponseDto;
-import com.highload.chatic.exception.IllegalAccessException;
+import com.highload.chatic.exception.InvalidRequestException;
 import com.highload.chatic.exception.ResourceNotFoundException;
 import com.highload.chatic.models.Message;
 import com.highload.chatic.models.MessageContent;
+import com.highload.chatic.models.MessageOperation;
 import com.highload.chatic.repository.MessageContentRepository;
 import com.highload.chatic.repository.MessageRepository;
+import com.highload.chatic.service.ChatService;
 import com.highload.chatic.service.MessageService;
 import com.highload.chatic.service.PersonService;
-import com.highload.chatic.service.PersonalChatService;
-import org.springframework.context.annotation.Lazy;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.UUID;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,53 +26,87 @@ public class MessageServiceImpl implements MessageService {
 
     private final MessageRepository messageRepository;
     private final MessageContentRepository messageContentRepository;
-    private final PersonalChatService personalChatService;
     private final PersonService personService;
+    private final ChatService chatService;
 
     @Override
-    public PageResponseDto<MessageResponseDto> getPersonalChatMessages(String username, UUID chatId, Pageable pageable) throws ResourceNotFoundException {
-        if (personalChatService.userCanNotEditChat(username, chatId))
-            throw new ResourceNotFoundException();
-        var messagesPage = messageRepository.findAllByChatIdOrderByTimestampDesc(chatId, pageable);
-        var messages = messagesPage.stream().collect(Collectors.toMap(
-                Message::getId, Function.identity()
-        ));
-        var contents =
-                messageContentRepository.findAllById(messages.values().stream().map(Message::getId).toList());
-        return new PageResponseDto<>(
-                MessageResponseDto.fromMessagesWithContent(messages, contents),
-                messagesPage.hasNext(),
-                pageable
-        );
+    @Transactional
+    public void updateMessage(String username, UUID messageID, MessageRequestDto messageRequestDto) {
+        var person = personService.getPerson(username);
+        checkPersonIsAuthor(person.getId(), messageID);
+        messageContentRepository.updateMessageContent(messageID, messageRequestDto.textContent());
     }
 
     @Override
-    public void updatePersonalChatMessage(String username, UUID chatId, MessageRequestDto messageRequestDto) throws ResourceNotFoundException {
-        if (personalChatService.userCanNotEditChat(username, chatId))
-            throw new ResourceNotFoundException();
-        var content = messageContentRepository.findByMessageId(messageRequestDto.id())
-                .orElseThrow(ResourceNotFoundException::new);
-        content.setText(messageRequestDto.textContent());
-        messageContentRepository.save(content);
-    }
-
-    @Override
-    public void deletePersonalChatMessage(String username, UUID chatId, UUID messageId) throws ResourceNotFoundException {
-        if (personalChatService.userCanNotEditChat(username, chatId))
-            throw new ResourceNotFoundException();
+    public void deleteMessage(String username, UUID messageId) {
+        var person = personService.getPerson(username);
+        checkPersonIsAuthor(person.getId(), messageId);
         messageRepository.deleteById(messageId);
     }
 
     @Override
     @Transactional
-    public MessageResponseDto addPersonalChatMessage(String username, UUID chatId, MessageRequestDto messageRequestDto) throws IllegalAccessException, ResourceNotFoundException {
-        if (personalChatService.userCanNotEditChat(username, chatId))
-            throw new IllegalAccessException();
-        var author = personService.getPerson(username);
-        var message = new Message(chatId, author.id(), messageRequestDto.replyId());
-        message = messageRepository.save(message);
-        var content = new MessageContent(message.getId(), messageRequestDto.textContent());
-        content = messageContentRepository.save(content);
+    public void addMessage(String username, MessageRequestDto messageRequestDto) {
+        var person = personService.getPerson(username);
+        chatService.authorizeOperation(messageRequestDto.chatId(), person.getId(), MessageOperation.WRITE);
+        Message message = new Message(messageRequestDto.chatId(), person.getId(), null);
+        messageRepository.save(message);
+        messageContentRepository.save(new MessageContent(message.getId(), messageRequestDto.textContent()));
+    }
+
+    @Override
+    @Transactional
+    public void addReply(String username, UUID replyId, MessageRequestDto messageRequestDto) {
+        var person = personService.getPerson(username);
+        chatService.authorizeOperation(messageRequestDto.chatId(), person.getId(), MessageOperation.REPLY);
+        messageRepository.findById(replyId).orElseThrow(InvalidRequestException::new);
+        Message message = new Message(messageRequestDto.chatId(), person.getId(), replyId);
+        messageRepository.save(message);
+        messageContentRepository.save(new MessageContent(message.getId(), messageRequestDto.textContent()));
+    }
+
+    @Override
+    public MessageResponseDto getMessage(String username, UUID messageId) {
+        var person = personService.getPerson(username);
+        var message = messageRepository.findById(messageId).orElseThrow(ResourceNotFoundException::new);
+        chatService.authorizeOperation(message.getChatId(), person.getId(), MessageOperation.READ);
+        var content = messageContentRepository.findByMessageId(messageId)
+                .orElseThrow(ResourceNotFoundException::new);
         return MessageResponseDto.fromMessageWithContent(message, content);
+    }
+
+    @Override
+    public PageResponseDto<MessageResponseDto> getChatMessages(String username, UUID chatId, Pageable pageable) {
+        var person = personService.getPerson(username);
+        chatService.authorizeOperation(chatId, person.getId(), MessageOperation.READ);
+        var messages = messageRepository.findAllByChatIdOrderByTimestampDesc(chatId, pageable);
+        var contents = messageContentRepository.findByMessageIdIn(messages
+                .getContent()
+                .stream()
+                .map(Message::getId)
+                .toList());
+        return new PageResponseDto<>(MessageResponseDto.fromMessagesWithContent(messages.getContent(), contents),
+                messages);
+    }
+
+    @Override
+    public PageResponseDto<MessageResponseDto> getMessageReplies(String username, UUID messageId, Pageable pageable) {
+        var person = personService.getPerson(username);
+        var message = messageRepository.findById(messageId).orElseThrow(ResourceNotFoundException::new);
+        chatService.authorizeOperation(message.getChatId(), person.getId(), MessageOperation.READ);
+        var messages = messageRepository.findAllByReplyIdOrderByTimestampDesc(messageId, pageable);
+        var contents = messageContentRepository.findByMessageIdIn(messages
+                .getContent()
+                .stream()
+                .map(Message::getId)
+                .toList());
+        return new PageResponseDto<>(MessageResponseDto.fromMessagesWithContent(messages.getContent(), contents),
+                messages);
+    }
+
+    private void checkPersonIsAuthor(UUID personId, UUID messageId) {
+        var message = messageRepository.findById(messageId)
+                .orElseThrow(ResourceNotFoundException::new);
+        if (!message.getAuthorId().equals(personId)) throw new ResourceNotFoundException();
     }
 }
