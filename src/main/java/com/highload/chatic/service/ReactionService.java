@@ -8,7 +8,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.UUID;
 
 public interface ReactionService {
-    void addReaction(String username, UUID id, ReactionDto reactionDto) throws ResourceNotFoundException;
+    void addReaction(String username, UUID messageId, ReactionDto reactionDto) throws ResourceNotFoundException;
 
     void deleteReaction(String username, UUID id) throws ResourceNotFoundException;
 

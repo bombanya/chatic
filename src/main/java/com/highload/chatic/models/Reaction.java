@@ -1,5 +1,8 @@
 package com.highload.chatic.models;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
@@ -7,6 +10,8 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "reaction", schema = "public", catalog = "chatic")
+@Getter
+@Setter
 public class Reaction {
     @EmbeddedId
     private ReactionId reactionId;
@@ -38,20 +43,4 @@ public class Reaction {
     public void setPerson(Person person) {
         reactionId.setPerson(person);
     }*/
-
-    public ReactionId getReactionId() {
-        return reactionId;
-    }
-
-    public void setReactionId(ReactionId reactionId) {
-        this.reactionId = reactionId;
-    }
-
-    public Emoji getEmoji() {
-        return emoji;
-    }
-
-    public void setEmoji(Emoji emoji) {
-        this.emoji = emoji;
-    }
 }
