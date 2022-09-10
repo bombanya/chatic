@@ -23,24 +23,13 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class MessageServiceImpl implements MessageService {
 
     private final MessageRepository messageRepository;
     private final MessageContentRepository messageContentRepository;
     private final PersonalChatService personalChatService;
     private final PersonService personService;
-
-    public MessageServiceImpl(
-            MessageRepository messageRepository,
-            MessageContentRepository messageContentRepository,
-            PersonalChatService personalChatService,
-            PersonService personService
-    ) {
-        this.messageRepository = messageRepository;
-        this.messageContentRepository = messageContentRepository;
-        this.personalChatService = personalChatService;
-        this.personService = personService;
-    }
 
     @Override
     public PageResponseDto<MessageResponseDto> getPersonalChatMessages(String username, UUID chatId, Pageable pageable) throws ResourceNotFoundException {

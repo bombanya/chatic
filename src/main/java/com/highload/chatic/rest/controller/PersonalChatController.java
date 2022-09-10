@@ -1,27 +1,23 @@
 package com.highload.chatic.rest.controller;
 
 import com.highload.chatic.dto.PageResponseDto;
-import com.highload.chatic.dto.message.MessageResponseDto;
 import com.highload.chatic.dto.personalchat.PersonalChatRequestDto;
 import com.highload.chatic.dto.personalchat.PersonalChatResponseDto;
 import com.highload.chatic.service.PersonalChatService;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.UUID;
 
 @RestController
+@RequiredArgsConstructor
 public class PersonalChatController {
 
     private final PersonalChatService service;
-
-    public PersonalChatController(PersonalChatService service) {
-        this.service = service;
-    }
 
     @GetMapping(value = "/personal-chat/{id}")
     @ResponseStatus(HttpStatus.OK)

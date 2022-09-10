@@ -8,6 +8,7 @@ import com.highload.chatic.models.PersonalChat;
 import com.highload.chatic.repository.PersonalChatRepository;
 import com.highload.chatic.service.PersonService;
 import com.highload.chatic.service.PersonalChatService;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -15,21 +16,12 @@ import org.springframework.stereotype.Service;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class PersonalChatServiceImpl implements PersonalChatService {
 
     private final PersonalChatRepository personalChatRepository;
     private final PersonService personService;
     private final ModelMapper modelMapper;
-
-    public PersonalChatServiceImpl(
-            PersonalChatRepository personalChatRepository,
-            PersonService personService,
-            ModelMapper modelMapper
-    ) {
-        this.personalChatRepository = personalChatRepository;
-        this.personService = personService;
-        this.modelMapper = modelMapper;
-    }
 
     @Override
     public PersonalChatResponseDto getChat(String username, UUID chatId) throws ResourceNotFoundException {
