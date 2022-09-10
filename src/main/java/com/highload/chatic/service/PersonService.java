@@ -1,11 +1,9 @@
 package com.highload.chatic.service;
 
-import com.highload.chatic.dto.person.PersonPageResponseDto;
 import com.highload.chatic.dto.person.PersonRequestDto;
 import com.highload.chatic.dto.person.PersonResponseDto;
+import com.highload.chatic.exception.IllegalAccessException;
 import com.highload.chatic.exception.ResourceNotFoundException;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -16,11 +14,9 @@ public interface PersonService {
 
     PersonResponseDto getPerson(String username) throws ResourceNotFoundException;
 
-    void registerNewPerson(PersonRequestDto personRequestDto);
+    void addPerson(String username, PersonRequestDto personRequestDto) throws ResourceNotFoundException, IllegalAccessException;
 
-    PersonPageResponseDto getPersons(UserDetails userDetails, Pageable pageable);
+    void updatePerson(String username, PersonRequestDto person) throws ResourceNotFoundException, IllegalAccessException, IllegalAccessException;
 
-    void updatePerson(UserDetails userDetails, PersonRequestDto person) throws ResourceNotFoundException, com.highload.chatic.exception.IllegalAccessException;
-
-    void deletePerson(UserDetails userDetails, UUID personId) throws ResourceNotFoundException, com.highload.chatic.exception.IllegalAccessException;
+    void deletePerson(String username, UUID personId) throws ResourceNotFoundException, IllegalAccessException;
 }

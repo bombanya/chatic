@@ -12,17 +12,15 @@ import java.util.UUID;
 @Repository
 public interface PersonalChatRepository extends JpaRepository<PersonalChat, UUID> {
     @Query(
-            value = "select * from PersonalChat where person1 = :personId or person2 = :personId \n-- #pageable\n",
-            countQuery = "select count(*) from PersonalChat where person1 = :personId or person2 = :personId",
-            nativeQuery = true
+            "select chat from PersonalChat chat " +
+            "where chat.person1Id = :personId or chat.person2Id = :personId"
     )
-    Page<PersonalChat> findAllByPerson1IdOrPerson2Id(UUID personId, Pageable pageable);
+    Page<PersonalChat> findAllUserChats(UUID personId, Pageable pageable);
+
 
     @Query(
-            value = "select * from PersonalChat c " +
-                    "where c.id = :id and " +
-                    "(c.person1 = :userId or c.person2 = :userId)",
-            nativeQuery = true
+            "select chat from PersonalChat chat " +
+            "where chat.id = :id and chat.person1Id <> :userId and chat.person2Id <> :userId"
     )
     boolean isNotUserChat(UUID id, UUID userId);
 }
