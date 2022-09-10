@@ -45,7 +45,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilter(jwtAuthFilter())
                 .addFilterAfter(jwtVerifyFilter, JwtAuthFilter.class)
                 .authorizeRequests()
-                .antMatchers("/registration","/login").permitAll()
+                .antMatchers("/login").permitAll()
                 .anyRequest().authenticated();
     }
 

@@ -1,79 +1,99 @@
-/*
-package com.highload.chatic.rest.controller;
+package com.highload.chatic.rest;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.highload.chatic.exception.IllegalAccessException;
 import com.highload.chatic.exception.InvalidRequestException;
 import com.highload.chatic.exception.ResourceNotFoundException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.NonNull;
-import org.springframework.lang.NonNullApi;
+import org.springframework.validation.FieldError;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.time.Instant;
-import java.time.format.DateTimeFormatter;
-import java.util.Locale;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @Override
-    protected ResponseEntity<Object> handleExceptionInternal(
-            Exception ex, Object body, HttpHeaders headers,
-            HttpStatus status, WebRequest request
-    ) {
-        ErrorResponseEntity responseBody = switch (ex) {
-            case ResourceNotFoundException e:
-                yield new ErrorResponseEntity(request.getLocale(), "Ресурс не найден", HttpStatus.NOT_FOUND, request.getContextPath());
-            case IllegalAccessException e:
-                yield new ErrorResponseEntity(request.getLocale(), "Недостаточно прав доступа", HttpStatus.FORBIDDEN, request.getContextPath());
-            case InvalidRequestException e:
-                yield new ErrorResponseEntity(request.getLocale(), "Неправильный запрос", HttpStatus.BAD_REQUEST, request.getContextPath());
-            default:
-                yield new ErrorResponseEntity(request.getLocale(), "Внутренняя ошибка сервера", HttpStatus.INTERNAL_SERVER_ERROR, request.getContextPath());
-        };
-        return new ResponseEntity<>(responseBody, responseBody.status);
+
+    @ExceptionHandler(IllegalAccessException.class)
+    public ResponseEntity<Object> handleIllegalAccessException(IllegalAccessException ex, WebRequest request) {
+        var responseBody = new ErrorResponseBody(ex.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(responseBody, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(InvalidRequestException.class)
+    public ResponseEntity<Object> handleInvalidRequestException(InvalidRequestException ex, WebRequest request) {
+        var responseBody = new ErrorResponseBody(ex.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<Object> handleResourceNotFoundException(ResourceNotFoundException ex, WebRequest request) {
+        var responseBody = new ErrorResponseBody(ex.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(responseBody, HttpStatus.NOT_FOUND);
     }
 
     @Override
-    protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        var responseBody = new ErrorResponseEntity(request.getLocale(), "Метод не поддерживается", HttpStatus.BAD_REQUEST, request.getContextPath());
+    protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex,
+                                                                         HttpHeaders headers,
+                                                                         HttpStatus status,
+                                                                         WebRequest request) {
+        var responseBody = new ErrorResponseBody("Метод не поддерживается",
+                request.getDescription(false));
         return new ResponseEntity<>(responseBody, status);
     }
 
     @Override
-    protected ResponseEntity<Object> handleHttpMediaTypeNotSupported(HttpMediaTypeNotSupportedException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        var responseBody = new ErrorResponseEntity(request.getLocale(), "Данный формат не поддерживается", HttpStatus.BAD_REQUEST, request.getContextPath());
+    protected ResponseEntity<Object> handleHttpMediaTypeNotSupported(HttpMediaTypeNotSupportedException ex,
+                                                                     HttpHeaders headers,
+                                                                     HttpStatus status,
+                                                                     WebRequest request) {
+        var responseBody = new ErrorResponseBody("Данный формат не поддерживается",
+                request.getDescription(false));
         return new ResponseEntity<>(responseBody, status);
     }
 
+
+    //exception from @Valid
     @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        var responseBody = new ErrorResponseEntity(request.getLocale(), "Неправильный запрос", HttpStatus.BAD_REQUEST, request.getContextPath());
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
+                                                                  HttpHeaders headers,
+                                                                  HttpStatus status,
+                                                                  WebRequest request) {
+        var responseBody = new ErrorResponseBody("Неправильный запрос",
+                request.getDescription(false),
+                ex.getFieldErrors());
         return new ResponseEntity<>(responseBody, status);
     }
 
-    public record ErrorResponseEntity(
-            String timestamp,
-            HttpStatus status,
-            String error,
+    @JsonInclude(Include.NON_NULL)
+    private record ErrorResponseBody(
+            Instant timestamp,
             String message,
-            String path
+            String path,
+            Map<String, String> fieldValidationErrors
     ) {
-        public ErrorResponseEntity(Locale locale, String message, HttpStatus status, String path) {
-            this(getTimeStamp(locale), status, status.name(), message, path);
+        public ErrorResponseBody(String message, String path) {
+            this(Instant.now(), message, path, null);
         }
 
-        private static String getTimeStamp(Locale locale) {
-            var formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME.localizedBy(locale);
-            return formatter.format(Instant.now());
+        private ErrorResponseBody(String message, String path, List<FieldError> fieldErrors) {
+            this(Instant.now(), message, path, fieldErrors
+                    .stream()
+                    .collect(Collectors.toMap(FieldError::getField,
+                            FieldError::getDefaultMessage)));
         }
     }
 }
-*/
+
