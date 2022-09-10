@@ -5,3 +5,5 @@ databaseChangeLog:
       file: db/changelog/V0_2/V0_2_security.sql
   - include:
       file: db/changelog/V0_3/V0_3_message_content.sql
+  - include:
+      file: db/changelog/V0_4/V0_4_single_personal_chat_constraint.sql
