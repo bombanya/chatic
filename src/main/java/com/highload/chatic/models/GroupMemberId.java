@@ -1,65 +1,42 @@
 package com.highload.chatic.models;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.UUID;
 
 @Embeddable
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class GroupMemberId implements Serializable {
-//    @ManyToOne
-//    @JoinColumn(name = "pgroup")
-//    private PGroup pgroup;
-
     @Column(name = "pgroup")
     private UUID pgroupId;
-
-//    @ManyToOne
-//    @JoinColumn(name = "person")
-//    private Person person;
-
     @Column(name = "person")
     private UUID personId;
 
-    public GroupMemberId(UUID pgroupId, UUID personId) {
-        this.pgroupId = pgroupId;
-        this.personId = personId;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        GroupMemberId that = (GroupMemberId) o;
+
+        if (!Objects.equals(pgroupId, that.pgroupId)) return false;
+        return Objects.equals(personId, that.personId);
     }
 
-    protected GroupMemberId() {
-    }
-
-//    public PGroup getPgroup() {
-//        return pgroup;
-//    }
-
-//    public void setPgroup(PGroup pgroup) {
-//        this.pgroup = pgroup;
-//    }
-
-//    public Person getPerson() {
-//        return person;
-//    }
-
-//    public void setPerson(Person person) {
-//        this.person = person;
-//    }
-
-    public UUID getPgroupId() {
-        return pgroupId;
-    }
-
-    public void setPgroupId(UUID pgroupId) {
-        this.pgroupId = pgroupId;
-    }
-
-    public UUID getPersonId() {
-        return personId;
-    }
-
-    public void setPersonId(UUID personId) {
-        this.personId = personId;
+    @Override
+    public int hashCode() {
+        int result = pgroupId != null ? pgroupId.hashCode() : 0;
+        result = 31 * result + (personId != null ? personId.hashCode() : 0);
+        return result;
     }
 }
