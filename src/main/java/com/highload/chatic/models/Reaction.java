@@ -1,25 +1,26 @@
 package com.highload.chatic.models;
 
-import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
+
+import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.util.UUID;
 
 @Entity
 @Table(name = "reaction", schema = "public", catalog = "chatic")
+@Getter
+@Setter
 public class Reaction {
     @EmbeddedId
     private ReactionId reactionId;
 
     @Column(name = "emoji")
-    @Size(max = 50, message = "Поле должно быть до 50 символов длиной")
-    @NotEmpty(message = "Нет реакции")
-    private String emoji;
+    @Enumerated(EnumType.STRING)
+    private Emoji emoji;
 
-    public Reaction(UUID messageId, UUID personId, String emoji) {
+    public Reaction(UUID messageId, UUID personId, Emoji emoji) {
         this.reactionId = new ReactionId(messageId, personId);
         this.emoji = emoji;
     }
@@ -42,12 +43,4 @@ public class Reaction {
     public void setPerson(Person person) {
         reactionId.setPerson(person);
     }*/
-
-    public String getEmoji() {
-        return emoji;
-    }
-
-    public void setEmoji(String emoji) {
-        this.emoji = emoji;
-    }
 }
