@@ -1,18 +1,8 @@
 package com.highload.chatic.exception;
 
-public class IllegalAccessException extends Exception {
+public class IllegalAccessException extends RuntimeException {
     public IllegalAccessException() {
+        super("Недостаточно прав доступа");
     }
 
-    public IllegalAccessException(String message) {
-        super(message);
-    }
-
-    public IllegalAccessException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public IllegalAccessException(Throwable cause) {
-        super(cause);
-    }
 }
