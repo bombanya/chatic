@@ -4,11 +4,9 @@ import com.highload.chatic.dto.person.PersonRequestDto;
 import com.highload.chatic.dto.person.PersonResponseDto;
 import com.highload.chatic.exception.IllegalAccessException;
 import com.highload.chatic.exception.ResourceNotFoundException;
-import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
-@Service
 public interface PersonService {
     PersonResponseDto getPerson(UUID personId) throws ResourceNotFoundException;
 

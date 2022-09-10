@@ -42,7 +42,7 @@ public class PersonalChatServiceImpl implements PersonalChatService {
     @Override
     public PageResponseDto<PersonalChatResponseDto> getAllChats(String username, Pageable pageable) throws ResourceNotFoundException {
         var user = personService.getPerson(username);
-        var page = personalChatRepository.findAllUserChats(user.id(), pageable)
+        var page = personalChatRepository.findAllUserChats(user.getId(), pageable)
                 .map(it -> modelMapper.map(it, PersonalChatResponseDto.class));
         return new PageResponseDto<>(page);
     }
@@ -57,6 +57,6 @@ public class PersonalChatServiceImpl implements PersonalChatService {
     @Override
     public boolean userCanNotEditChat(String username, UUID chatId) throws ResourceNotFoundException {
         var person = personService.getPerson(username);
-        return personalChatRepository.isNotUserChat(chatId, person.id());
+        return personalChatRepository.isNotUserChat(chatId, person.getId());
     }
 }

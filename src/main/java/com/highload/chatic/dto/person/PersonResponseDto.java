@@ -1,13 +1,14 @@
 package com.highload.chatic.dto.person;
 
-import com.highload.chatic.dto.device.DeviceResponseDto;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.List;
 import java.util.UUID;
 
-public record PersonResponseDto(
-        UUID id,
-        String username,
-        String bio
-) {
+@Getter
+@Setter
+public class PersonResponseDto {
+    private UUID id;
+    private String username;
+    private String bio;
 }

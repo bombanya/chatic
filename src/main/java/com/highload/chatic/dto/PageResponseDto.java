@@ -1,7 +1,6 @@
 package com.highload.chatic.dto;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -9,23 +8,20 @@ public record PageResponseDto<T>(
         List<T> page,
         boolean hasNext,
         int currentPage,
-        int pageSize
+        int pageSize,
+        int totalPages
 ) {
     public PageResponseDto(Page<T> page) {
         this(
-                page.toList(),
+                page.getContent(),
                 page.hasNext(),
-                page.getPageable().getPageNumber(),
-                page.getPageable().getPageSize()
+                page.getNumber(),
+                page.getNumberOfElements(),
+                page.getTotalPages()
         );
     }
 
-    public PageResponseDto(List<T> page, boolean hasNext, Pageable pageable) {
-        this(
-                page,
-                hasNext,
-                pageable.getPageNumber(),
-                pageable.getPageSize()
-        );
+    public PageResponseDto(List<T> data, Page<?> page) {
+        this(data, page.hasNext(), page.getNumber(), page.getNumberOfElements(), page.getTotalPages());
     }
 }
