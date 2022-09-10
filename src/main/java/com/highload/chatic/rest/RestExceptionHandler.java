@@ -1,5 +1,4 @@
-/*
-package com.highload.chatic.rest.controller;
+package com.highload.chatic.rest;
 
 import com.highload.chatic.exception.IllegalAccessException;
 import com.highload.chatic.exception.InvalidRequestException;
@@ -7,8 +6,6 @@ import com.highload.chatic.exception.ResourceNotFoundException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.NonNull;
-import org.springframework.lang.NonNullApi;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -28,16 +25,16 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             Exception ex, Object body, HttpHeaders headers,
             HttpStatus status, WebRequest request
     ) {
-        ErrorResponseEntity responseBody = switch (ex) {
-            case ResourceNotFoundException e:
-                yield new ErrorResponseEntity(request.getLocale(), "Ресурс не найден", HttpStatus.NOT_FOUND, request.getContextPath());
-            case IllegalAccessException e:
-                yield new ErrorResponseEntity(request.getLocale(), "Недостаточно прав доступа", HttpStatus.FORBIDDEN, request.getContextPath());
-            case InvalidRequestException e:
-                yield new ErrorResponseEntity(request.getLocale(), "Неправильный запрос", HttpStatus.BAD_REQUEST, request.getContextPath());
-            default:
-                yield new ErrorResponseEntity(request.getLocale(), "Внутренняя ошибка сервера", HttpStatus.INTERNAL_SERVER_ERROR, request.getContextPath());
-        };
+        ErrorResponseEntity responseBody;
+        if (ex instanceof ResourceNotFoundException) {
+            responseBody = new ErrorResponseEntity(request.getLocale(), "Ресурс не найден", HttpStatus.NOT_FOUND, request.getContextPath());
+        } else if (ex instanceof IllegalAccessException) {
+            responseBody = new ErrorResponseEntity(request.getLocale(), "Недостаточно прав доступа", HttpStatus.FORBIDDEN, request.getContextPath());
+        } else if (ex instanceof InvalidRequestException) {
+            responseBody = new ErrorResponseEntity(request.getLocale(), "Неправильный запрос", HttpStatus.BAD_REQUEST, request.getContextPath());
+        } else {
+            responseBody = new ErrorResponseEntity(request.getLocale(), "Внутренняя ошибка сервера", HttpStatus.INTERNAL_SERVER_ERROR, request.getContextPath());
+        }
         return new ResponseEntity<>(responseBody, responseBody.status);
     }
 
@@ -76,4 +73,3 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         }
     }
 }
-*/
