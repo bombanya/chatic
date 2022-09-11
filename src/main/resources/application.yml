@@ -15,5 +15,6 @@ spring:
     show-sql: true
     generate-ddl: false
 
-jwt:
-  secret: ${JWT_SECRET}
+rsa:
+  private-key: classpath:certs/private.pem
+  public-key: classpath:certs/public.pem
