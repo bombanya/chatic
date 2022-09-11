@@ -1,17 +1,12 @@
 package com.highload.chatic.rest.controller;
 
 import com.highload.chatic.dto.PageResponseDto;
-import com.highload.chatic.dto.ReactionDto;
-import com.highload.chatic.dto.message.MessageRequestDto;
-import com.highload.chatic.dto.message.MessageResponseDto;
-import com.highload.chatic.dto.validation.AddRequest;
-import com.highload.chatic.dto.validation.UpdateRequest;
-import com.highload.chatic.service.MessageService;
+import com.highload.chatic.dto.reaction.ReactionRequestDto;
+import com.highload.chatic.dto.reaction.ReactionResponseDto;
 import com.highload.chatic.service.ReactionService;
-import lombok.SneakyThrows;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -19,45 +14,39 @@ import java.security.Principal;
 import java.util.UUID;
 
 @RestController
-@Validated
+@RequestMapping("messages/{messageId}/reactions")
+@RequiredArgsConstructor
 public class ReactionController {
 
     private final ReactionService service;
 
-    public ReactionController(ReactionService reactionService) {
-        this.service = reactionService;
-    }
-
-    @GetMapping(value = "/reaction/{id}", params = {"page", "size"})
+    @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    @SneakyThrows
-    public PageResponseDto<ReactionDto> getReactions(
-            @PathVariable UUID id,
-            @RequestParam int page,
-            @RequestParam int size,
+    public PageResponseDto<ReactionResponseDto> getReactions (
+            @PathVariable UUID messageId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
             Principal principal
     ) {
-        return service.getReactions(principal.getName(), id, PageRequest.of(page, size));
+        return service.getReactions(principal.getName(), messageId, PageRequest.of(page, size));
     }
 
-    @PostMapping("/reaction/{id}")
+    @PutMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @SneakyThrows
     public void addReaction(
-            @PathVariable UUID id,
-            @RequestBody @Valid ReactionDto reactionDto,
+            @PathVariable UUID messageId,
+            @RequestBody @Valid ReactionRequestDto reactionRequestDto,
             Principal principal
     ) {
-        service.addReaction(principal.getName(), id, reactionDto);
+        service.addReaction(principal.getName(), messageId, reactionRequestDto);
     }
 
-    @DeleteMapping("/reaction/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @SneakyThrows
+    @DeleteMapping
+    @ResponseStatus(HttpStatus.OK)
     public void deleteReaction(
-            @PathVariable UUID id,
+            @PathVariable UUID messageId,
             Principal principal
     ) {
-        service.deleteReaction(principal.getName(), id);
+        service.deleteReaction(principal.getName(), messageId);
     }
 }
