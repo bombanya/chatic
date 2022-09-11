@@ -1,7 +1,6 @@
 package com.highload.chatic.rest.controller;
 
 import com.highload.chatic.dto.PageResponseDto;
-import com.highload.chatic.dto.personalchat.PersonalChatRequestDto;
 import com.highload.chatic.dto.personalchat.PersonalChatResponseDto;
 import com.highload.chatic.service.PersonalChatService;
 import lombok.RequiredArgsConstructor;
@@ -11,25 +10,25 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("personal-chats")
 public class PersonalChatController {
 
     private final PersonalChatService service;
 
-    @GetMapping(value = "/personal-chat/{id}")
+    @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    @SneakyThrows
     public PersonalChatResponseDto getPersonalChat(
-            @PathVariable UUID id,
+            @RequestParam String username,
             Principal principal
     ) {
-        return service.getChat(principal.getName(), id);
+        return service.getChat(principal.getName(), username);
     }
 
-    @GetMapping(value = "/personal-chats", params = {"page", "size"})
+    //кажется, логичнее вынести в общий контроллер для чатов
+    @GetMapping(params = {"page", "size"})
     @ResponseStatus(HttpStatus.OK)
     @SneakyThrows
     public PageResponseDto<PersonalChatResponseDto> getPersonalChats(
@@ -40,25 +39,13 @@ public class PersonalChatController {
         return service.getAllChats(principal.getName(), PageRequest.of(page, size));
     }
 
-    @PostMapping("/personal-chat")
-    @ResponseBody
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @SneakyThrows
     public PersonalChatResponseDto addPersonalChat(
-            @RequestBody PersonalChatRequestDto chatDto,
+            @RequestParam String username,
             Principal principal
     ) {
-        return service.addChat(principal.getName(), chatDto);
-    }
-
-    @DeleteMapping("/personal-chat/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @SneakyThrows
-    public void deletePersonalChat(
-            @PathVariable UUID id,
-            Principal principal
-    ) {
-        service.deleteChat(principal.getName(), id);
+        return service.addChat(principal.getName(), username);
     }
 
 }
