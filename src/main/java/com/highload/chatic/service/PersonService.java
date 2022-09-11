@@ -2,19 +2,17 @@ package com.highload.chatic.service;
 
 import com.highload.chatic.dto.person.PersonRequestDto;
 import com.highload.chatic.dto.person.PersonResponseDto;
-import com.highload.chatic.exception.IllegalAccessException;
-import com.highload.chatic.exception.ResourceNotFoundException;
 
 import java.util.UUID;
 
 public interface PersonService {
-    PersonResponseDto getPerson(UUID personId) throws ResourceNotFoundException;
+    PersonResponseDto getPerson(UUID personId);
 
-    PersonResponseDto getPerson(String username) throws ResourceNotFoundException;
+    PersonResponseDto getPerson(String username);
 
-    void addPerson(String username, PersonRequestDto personRequestDto) throws ResourceNotFoundException, IllegalAccessException;
+    void addPerson(PersonRequestDto personRequestDto);
 
-    void updatePerson(String username, PersonRequestDto person) throws ResourceNotFoundException, IllegalAccessException, IllegalAccessException;
+    void updatePerson(PersonRequestDto person);
 
-    void deletePerson(String username, UUID personId) throws ResourceNotFoundException, IllegalAccessException;
+    void deletePerson(String username);
 }

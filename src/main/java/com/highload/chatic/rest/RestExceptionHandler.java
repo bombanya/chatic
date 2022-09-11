@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.highload.chatic.exception.IllegalAccessException;
 import com.highload.chatic.exception.InvalidRequestException;
 import com.highload.chatic.exception.ResourceNotFoundException;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,6 +43,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleResourceNotFoundException(ResourceNotFoundException ex, WebRequest request) {
         var responseBody = new ErrorResponseBody(ex.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(responseBody, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(DataAccessException.class)
+    public ResponseEntity<Object> handleDataAccessException(WebRequest request) {
+        var responseBody = new ErrorResponseBody("Неправильный запрос",
+                request.getDescription(false));
+        return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
     }
 
     @Override

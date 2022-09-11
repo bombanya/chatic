@@ -1,39 +1,43 @@
 package com.highload.chatic.rest.controller;
 
 import com.highload.chatic.dto.person.PersonRequestDto;
+import com.highload.chatic.dto.person.PersonResponseDto;
 import com.highload.chatic.dto.validation.AddRequest;
 import com.highload.chatic.service.PersonService;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.security.Principal;
 
 @RestController
 @RequiredArgsConstructor
 @Validated
+@RequestMapping("persons")
 public class PersonController {
 
     private final PersonService personService;
 
-    @PostMapping("/registration")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @SneakyThrows
+    @PostMapping
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    @ResponseStatus(HttpStatus.CREATED)
     @Validated(AddRequest.class)
-    public ResponseEntity<?> register(@RequestBody @Valid PersonRequestDto personRequestDto,
-                                      BindingResult bindingResult,
-                                      Authentication authentication) {
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().build();
-        }
-        personService.addPerson(authentication.getName(), personRequestDto);
-        return ResponseEntity.ok().build();
+    public void addPerson(@RequestBody @Valid PersonRequestDto personRequestDto) {
+        personService.addPerson(personRequestDto);
+    }
+
+    @GetMapping("{username}")
+    @ResponseStatus(HttpStatus.OK)
+    public PersonResponseDto getPerson(@PathVariable String username) {
+        return personService.getPerson(username);
+    }
+
+    @DeleteMapping("{username}")
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN') or #username == #principal.name")
+    public void deletePerson(@PathVariable String username, Principal principal) {
+        personService.deletePerson(username);
     }
 }
