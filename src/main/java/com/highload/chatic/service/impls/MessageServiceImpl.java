@@ -3,6 +3,7 @@ package com.highload.chatic.service.impls;
 import com.highload.chatic.dto.PageResponseDto;
 import com.highload.chatic.dto.message.MessageRequestDto;
 import com.highload.chatic.dto.message.MessageResponseDto;
+import com.highload.chatic.exception.IllegalAccessException;
 import com.highload.chatic.exception.InvalidRequestException;
 import com.highload.chatic.exception.ResourceNotFoundException;
 import com.highload.chatic.models.Message;
@@ -102,6 +103,14 @@ public class MessageServiceImpl implements MessageService {
                 .toList());
         return new PageResponseDto<>(MessageResponseDto.fromMessagesWithContent(messages.getContent(), contents),
                 messages);
+    }
+
+    @Override
+    public void authorizeOperationOnMessage(UUID messageId, UUID personId, MessageOperation operation) {
+        var message = messageRepository.findById(messageId)
+                .orElseThrow(ResourceNotFoundException::new);
+        if (operation == MessageOperation.WRITE) throw new IllegalAccessException();
+        chatService.authorizeOperation(message.getChatId(), personId, operation);
     }
 
     private void checkPersonIsAuthor(UUID personId, UUID messageId) {
