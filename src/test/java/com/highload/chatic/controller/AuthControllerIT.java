@@ -37,4 +37,12 @@ public class AuthControllerIT extends ChaticApplicationTests {
         //return response.getHeaders().get("Authorization").get(0);
     }
 
+
+    @Test
+    public void login_incorrect() throws URISyntaxException {
+        ResponseEntity<Map> response = sendAuth("admin1", "admin188");
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+
+        //return response.getHeaders().get("Authorization").get(0);
+    }
 }
