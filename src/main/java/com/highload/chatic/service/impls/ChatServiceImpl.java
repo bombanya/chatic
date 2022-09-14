@@ -1,6 +1,6 @@
 package com.highload.chatic.service.impls;
 
-import com.highload.chatic.dto.GroupMemberDto;
+import com.highload.chatic.dto.group.GroupMemberDto;
 import com.highload.chatic.exception.IllegalAccessException;
 import com.highload.chatic.exception.ResourceNotFoundException;
 import com.highload.chatic.models.MessageOperation;

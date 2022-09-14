@@ -27,6 +27,13 @@ insert into person values (
                               'bio',
                               '$2a$10$N58pnuVRauXEAr0w6jtauuYw.xL6D/W4nKVL267IYkl9v3.5CjEle',
                               'USER'
+                          ),
+                          (
+                              '7f121e94-a6b8-42ae-9e31-e6f4eb809038',
+                              'user30',
+                              'bio',
+                              '$2a$10$z/hUvVLZhYhLZRjGelUlIOjFRWbUBhy4.Z3ZFkzfXfU44Rrj6ZxZm',
+                              'USER'
                           );
 
 --changeset user:15
@@ -91,3 +98,48 @@ insert into reaction values (
                                 '8df618ef-887f-410f-8608-3323c9ab71ae',
                                 'LIKE'
                             );
+
+--changeset user:20
+insert into chat values (
+                            '8bb5e6f2-0247-44f0-8bab-a6790df871d4'
+                        );
+
+insert into pgroup values (
+                                '8bb5e6f2-0247-44f0-8bab-a6790df871d4'
+                            );
+
+insert into grouprole values (
+                                 'a436abc7-6ce4-493a-bdd2-39ec35cf057e',
+                                 'true',
+                                 'true',
+                                 'true'
+                             ),
+                             (
+                                 '5dd1f7aa-db94-407a-b896-915a4bdf75ba',
+                                 'true',
+                                 'true',
+                                 'false'
+                             ),
+                             (
+                                 'bc54f4cc-db94-407a-b896-915a4bdf75ba',
+                                 'true',
+                                 'true',
+                                 'false'
+                             ) ;
+
+insert into groupmember values (
+                                '8bb5e6f2-0247-44f0-8bab-a6790df871d4',
+                                '1ced10d0-a0b2-42c7-b9c6-d8e3b4946bcb',
+                                'a436abc7-6ce4-493a-bdd2-39ec35cf057e'
+                          ),
+
+                               (
+                                   '8bb5e6f2-0247-44f0-8bab-a6790df871d4',
+                                   '54dbaf5b-101c-4958-8857-877cdd312b59',
+                                   '5dd1f7aa-db94-407a-b896-915a4bdf75ba'
+                               ),
+                               (
+                                   '8bb5e6f2-0247-44f0-8bab-a6790df871d4',
+                                   '7f121e94-a6b8-42ae-9e31-e6f4eb809038',
+                                   'bc54f4cc-db94-407a-b896-915a4bdf75ba'
+                               );
