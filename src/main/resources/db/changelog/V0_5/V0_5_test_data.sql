@@ -40,3 +40,54 @@ insert into personalchat values (
                               '54dbaf5b-101c-4958-8857-877cdd312b59',
                               '8df618ef-887f-410f-8608-3323c9ab71ae'
                           );
+
+--changeset user:17
+insert into message values (
+                                    'cdf6d98f-e42d-41ce-be0c-6431af9f7dda',
+                                    '4ae20120-419b-4679-8d13-68b9e917572c',
+                                    '54dbaf5b-101c-4958-8857-877cdd312b59',
+                                    '2022-09-14 12:23:26.295000',
+                                     null
+                                ),
+                           (
+                               'c2b57b8e-146a-4f7b-b207-a17b8d24744b',
+                               '4ae20120-419b-4679-8d13-68b9e917572c',
+                               '8df618ef-887f-410f-8608-3323c9ab71ae',
+                               '2022-09-14 13:29:12.760000',
+                               null
+                           ),
+                           (
+                               'd03c2a38-210b-4792-9bb4-cd50de4d981c',
+                               '4ae20120-419b-4679-8d13-68b9e917572c',
+                               '8df618ef-887f-410f-8608-3323c9ab71ae',
+                               '2022-09-14 13:58:07.858000',
+                               null
+                           );
+
+--changeset user:18
+insert into messagecontent values (
+                               'f977ce39-b68e-436e-943b-fdf645eec9ec',
+                               'd03c2a38-210b-4792-9bb4-cd50de4d981c',
+                               'text2'
+                           ),
+                           (
+                               'f977ce39-b68e-436e-943b-fdf645eec9ed',
+                               'c2b57b8e-146a-4f7b-b207-a17b8d24744b',
+                               'text2'
+                           ),(
+                               'f977ce39-b68e-436e-943b-fdf645eec9eb',
+                               'cdf6d98f-e42d-41ce-be0c-6431af9f7dda',
+                               'text2'
+                           );
+
+--changeset user:19
+insert into reaction values (
+                                      'cdf6d98f-e42d-41ce-be0c-6431af9f7dda',
+                                      '54dbaf5b-101c-4958-8857-877cdd312b59',
+                                      'CLOWN'
+                                  ),
+                            (
+                                'c2b57b8e-146a-4f7b-b207-a17b8d24744b',
+                                '8df618ef-887f-410f-8608-3323c9ab71ae',
+                                'LIKE'
+                            );
