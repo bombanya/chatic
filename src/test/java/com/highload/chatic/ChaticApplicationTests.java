@@ -24,4 +24,5 @@ public abstract class ChaticApplicationTests {
     static void init() {
         Postgres.container.start();
     }
+
 }

@@ -2,6 +2,7 @@ package com.highload.chatic.service.impls;
 
 import com.highload.chatic.dto.PageResponseDto;
 import com.highload.chatic.dto.personalchat.PersonalChatResponseDto;
+import com.highload.chatic.exception.InvalidRequestException;
 import com.highload.chatic.exception.ResourceNotFoundException;
 import com.highload.chatic.models.PersonalChat;
 import com.highload.chatic.repository.PersonalChatRepository;
@@ -34,6 +35,9 @@ public class PersonalChatServiceImpl implements PersonalChatService {
     public PersonalChatResponseDto addChat(String username1, String username2) {
         var person1 = personService.getPerson(username1);
         var person2 = personService.getPerson(username2);
+        if(personalChatRepository
+                .findByPerson1IdAndPerson2Id(person1.getId(), person2.getId()).isPresent())
+            throw new InvalidRequestException();
         var personalChat = personalChatRepository
                 .findByPerson1IdAndPerson2Id(person1.getId(), person2.getId())
                 .orElseGet(() -> personalChatRepository

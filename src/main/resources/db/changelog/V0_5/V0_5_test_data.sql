@@ -28,3 +28,15 @@ insert into person values (
                               '$2a$10$N58pnuVRauXEAr0w6jtauuYw.xL6D/W4nKVL267IYkl9v3.5CjEle',
                               'USER'
                           );
+
+--changeset user:15
+insert into chat values (
+                               '4ae20120-419b-4679-8d13-68b9e917572c'
+                        );
+
+--changeset user:16
+insert into personalchat values (
+                              '4ae20120-419b-4679-8d13-68b9e917572c',
+                              '54dbaf5b-101c-4958-8857-877cdd312b59',
+                              '8df618ef-887f-410f-8608-3323c9ab71ae'
+                          );
