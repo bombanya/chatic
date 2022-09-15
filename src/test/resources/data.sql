@@ -10,21 +10,21 @@ insert into person values (
                               '8df618ef-887f-410f-8608-3323c9ab71ae',
                               'user1',
                               'bio',
-                              '$2a$10$It4XQL6D1GA8iiLKB5S9qeUWY2slGwafNMwNn.h0/MdUo1vURfIX2', --user1
+                              '$2a$10$m6rWHhvJdnRl7SCSqRKF7eZohUSME/1j1pI38tC3okWdYTWzFr0fi', --user1
                               'USER'
                           ),
                           (
                               '54dbaf5b-101c-4958-8857-877cdd312b59',
                               'user2',
                               'bio',
-                              '$2a$10$cf0rMybjsP9BkTzmWcjWiumiljSySo.oRtjJWGXP0YQxt.yveKsi2', --user2
+                              '$2a$10$S0MmA7PEq9ZGNf34.Qb6Yuvw5D.MuvvU9eeLoEd/.psxksXruWXHy', --user2
                               'USER'
                           ),
                           (
                               '1ced10d0-a0b2-42c7-b9c6-d8e3b4946bcb',
                               'user3',
                               'bio',
-                              '$2a$10$19I7v0EzwUBQArh85CAs9.nqk63uKZtMZXR77Fb4fLGwfTsBcjNCi', --user3
+                              '$2a$10$WiTU6YGY.ncV.Z66qnjVuuhaRoANmmMkqn8RHG7U6XoxMgY9z3RYS', --user3
                               'USER'
                           );
 

@@ -1,5 +1,6 @@
 package com.highload.chatic.controller;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,12 +16,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("integration-test")
+@Sql(scripts = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(scripts = "classpath:delete_data.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 public class AuthControllerIT {
     @Autowired
     private TestRestTemplate restTemplate;
 
     @LocalServerPort
     private int port;
+
+    @AfterEach
+    void tearDown() {}
 
     public ResponseEntity<?> sendAuth(String username, String password) {
         String baseUrl = "http://localhost:" + port + "/login";
@@ -30,7 +36,6 @@ public class AuthControllerIT {
     }
 
     @Test
-    @Sql("classpath:data.sql")
     public void login() {
         var response = sendAuth("admin", "admin");
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -38,7 +43,6 @@ public class AuthControllerIT {
 
 
     @Test
-    @Sql("classpath:data.sql")
     public void loginIncorrect() {
         var response = sendAuth("admin", "admin1");
         assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());

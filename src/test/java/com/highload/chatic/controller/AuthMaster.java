@@ -15,8 +15,9 @@ public class AuthMaster {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    public <T> HttpEntity<T> createRequestWithAuthHeader(String username, String password, T body, int port) {
-        String baseUrl = "http://localhost:" + port + "/login";
+    public <T> HttpEntity<T> createRequestWithAuthHeader(String username, String password,
+                                                         String baseUrl, T body) {
+        baseUrl += "/login";
 
         var response = restTemplate.withBasicAuth(username, password)
                 .postForEntity(baseUrl, null, Object.class);

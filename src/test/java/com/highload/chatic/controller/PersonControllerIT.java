@@ -18,6 +18,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("integration-test")
+@Sql(scripts = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(scripts = "classpath:delete_data.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 public class PersonControllerIT {
     @Autowired
     private TestRestTemplate restTemplate;
@@ -32,12 +34,7 @@ public class PersonControllerIT {
 
     @BeforeEach
     void setUp() {
-        baseUrl = "http://localhost:" + port + "/persons";
-    }
-
-    @BeforeAll
-    @Sql("classpath:data.sql")
-    static void beforeAll() {
+        baseUrl = "http://localhost:" + port;
     }
 
     @Test
@@ -49,9 +46,10 @@ public class PersonControllerIT {
         personRequestDto.setBio("bio");
         personRequestDto.setAuthRole(AuthRoleName.USER);
         var requestEntity = authMaster
-                .createRequestWithAuthHeader("admin", "admin", personRequestDto, port);
+                .createRequestWithAuthHeader("admin", "admin", baseUrl, personRequestDto);
 
-        ResponseEntity<?> response = restTemplate.exchange(baseUrl, HttpMethod.POST, requestEntity, Object.class);
+        ResponseEntity<?> response = restTemplate.exchange(baseUrl + "/persons",
+                HttpMethod.POST, requestEntity, Object.class);
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
     }
 
@@ -63,9 +61,10 @@ public class PersonControllerIT {
         personRequestDto.setBio("bio");
         personRequestDto.setAuthRole(AuthRoleName.USER);
         HttpEntity<PersonRequestDto> requestEntity = authMaster
-                .createRequestWithAuthHeader("admin", "admin", personRequestDto, port);
+                .createRequestWithAuthHeader("admin", "admin", baseUrl, personRequestDto);
 
-        ResponseEntity<String> response = restTemplate.exchange(baseUrl, HttpMethod.POST, requestEntity, String.class);
+        ResponseEntity<String> response = restTemplate.exchange(baseUrl + "/persons",
+                HttpMethod.POST, requestEntity, String.class);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 
@@ -78,7 +77,8 @@ public class PersonControllerIT {
         personRequestDto.setAuthRole(AuthRoleName.USER);
         HttpEntity<PersonRequestDto> requestEntity = new HttpEntity<>(personRequestDto);
 
-        ResponseEntity<String> response = restTemplate.exchange(baseUrl, HttpMethod.POST, requestEntity, String.class);
+        ResponseEntity<String> response = restTemplate.exchange(baseUrl  + "/persons",
+                HttpMethod.POST, requestEntity, String.class);
         assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
     }
 
@@ -90,18 +90,19 @@ public class PersonControllerIT {
         personRequestDto.setBio("bio");
         personRequestDto.setAuthRole(AuthRoleName.USER);
         HttpEntity<PersonRequestDto> requestEntity = authMaster
-                .createRequestWithAuthHeader("user1", "user1", personRequestDto, port);
+                .createRequestWithAuthHeader("user1", "user1", baseUrl, personRequestDto);
 
-        ResponseEntity<String> response = restTemplate.exchange(baseUrl, HttpMethod.POST, requestEntity, String.class);
+        ResponseEntity<String> response = restTemplate.exchange(baseUrl + "/persons",
+                HttpMethod.POST, requestEntity, String.class);
         assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
 
     @Test
     public void getPerson() {
-        String name = "/admin";
+        String name = "/persons/admin";
 
         HttpEntity<?> requestEntity = authMaster
-                .createRequestWithAuthHeader("user1", "user1", null, port);
+                .createRequestWithAuthHeader("user1", "user1", baseUrl, null);
 
         ResponseEntity<String> response = restTemplate.exchange(
                 baseUrl + name, HttpMethod.GET, requestEntity, String.class);
@@ -110,10 +111,10 @@ public class PersonControllerIT {
 
     @Test
     public void getPerson_notExisting() {
-        String name = "/asdf";
+        String name = "/persons/asdf";
 
         HttpEntity<?> requestEntity = authMaster
-                .createRequestWithAuthHeader("user1", "user1", null, port);
+                .createRequestWithAuthHeader("user1", "user1", baseUrl, null);
 
         ResponseEntity<String> response = restTemplate.exchange(
                 baseUrl + name, HttpMethod.GET, requestEntity, String.class);
@@ -123,17 +124,17 @@ public class PersonControllerIT {
 
     @Test
     public void getPerson_notAuthorized() {
-        String name = "/admin";
+        String name = "/persons/admin";
         ResponseEntity<?> response = restTemplate.getForEntity(baseUrl + name, Object.class);
         assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
     }
 
     @Test
     public void deletePerson_admin() {
-        String name = "/user1";
+        String name = "/persons/user1";
 
         HttpEntity<?> requestEntity = authMaster
-                .createRequestWithAuthHeader("admin", "admin", null, port);
+                .createRequestWithAuthHeader("admin", "admin", baseUrl, null);
 
         ResponseEntity<String> response = restTemplate.exchange(
                 baseUrl + name, HttpMethod.DELETE, requestEntity, String.class);
@@ -142,10 +143,10 @@ public class PersonControllerIT {
 
     @Test
     public void deletePerson_thisPerson() {
-        String name = "/user1";
+        String name = "/persons/user1";
 
         HttpEntity<?> requestEntity = authMaster
-                .createRequestWithAuthHeader("user1", "user1", null, port);
+                .createRequestWithAuthHeader("user1", "user1", baseUrl, null);
 
         ResponseEntity<String> response = restTemplate.exchange(
                 baseUrl + name, HttpMethod.DELETE, requestEntity, String.class);
@@ -154,10 +155,10 @@ public class PersonControllerIT {
 
     @Test
     public void deletePerson_notExisting() {
-        String name = "/asdf";
+        String name = "/persons/asdf";
 
         HttpEntity<?> requestEntity = authMaster
-                .createRequestWithAuthHeader("admin", "admin", null, port);
+                .createRequestWithAuthHeader("admin", "admin", baseUrl, null);
 
         ResponseEntity<String> response = restTemplate.exchange(
                 baseUrl + name, HttpMethod.DELETE, requestEntity, String.class);
@@ -166,7 +167,7 @@ public class PersonControllerIT {
 
     @Test
     public void deletePerson_notAuthorized() {
-        String name = "/user1";
+        String name = "/persons/user1";
 
         HttpHeaders headers = new HttpHeaders();
         HttpEntity<?> requestEntity = new HttpEntity<>(headers);
@@ -178,10 +179,10 @@ public class PersonControllerIT {
 
     @Test
     public void deletePerson_notAdminNotThisPerson() {
-        String name = "/user1";
+        String name = "/persons/user1";
 
         HttpEntity<Void> requestEntity = authMaster
-                .createRequestWithAuthHeader("user2", "user2", null, port);
+                .createRequestWithAuthHeader("user2", "user2", baseUrl, null);
 
         ResponseEntity<String> response = restTemplate.exchange(
                 baseUrl + name, HttpMethod.DELETE, requestEntity, String.class);
