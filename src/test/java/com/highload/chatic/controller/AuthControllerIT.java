@@ -1,44 +1,46 @@
 package com.highload.chatic.controller;
 
-import com.highload.chatic.ChaticApplicationTests;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.*;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Map;
-
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class AuthControllerIT extends ChaticApplicationTests {
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("integration-test")
+public class AuthControllerIT {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    public ResponseEntity<Map> sendAuth(String username, String password) throws URISyntaxException {
-        final String baseUrl = "http://localhost:8080/login";
-        URI uri = new URI(baseUrl);
+    @LocalServerPort
+    private int port;
 
-        return restTemplate.withBasicAuth(username, password).postForEntity(uri, null, Map.class);
+    public ResponseEntity<?> sendAuth(String username, String password) {
+        String baseUrl = "http://localhost:" + port + "/login";
+
+        return restTemplate.withBasicAuth(username, password)
+                .postForEntity(baseUrl, null, Object.class);
     }
 
-
     @Test
-    @Sql({"/sql/auth.sql"})
-    public void login() throws URISyntaxException {
-        ResponseEntity<Map> response = sendAuth("admin1", "admin1");
+    @Sql("classpath:data.sql")
+    public void login() {
+        var response = sendAuth("admin", "admin");
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
 
     @Test
-    public void login_incorrect() throws URISyntaxException {
-        ResponseEntity<Map> response = sendAuth("admin1", "admin188");
+    @Sql("classpath:data.sql")
+    public void loginIncorrect() {
+        var response = sendAuth("admin", "admin1");
         assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
     }
 }

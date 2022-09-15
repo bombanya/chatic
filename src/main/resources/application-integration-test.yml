@@ -1,0 +1,11 @@
+embedded:
+  postgresql:
+    enabled: true
+    docker-image: postgres:12-alpine
+
+DB_HOST: ${embedded.postgresql.host}
+POSTGRES_DOCKER_PORT: ${embedded.postgresql.port}
+POSTGRES_DB: ${embedded.postgresql.schema}
+POSTGRES_USER: ${embedded.postgresql.user}
+POSTGRES_PASSWORD: ${embedded.postgresql.password}
+

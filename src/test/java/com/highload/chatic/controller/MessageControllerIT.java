@@ -1,11 +1,12 @@
 package com.highload.chatic.controller;
 
-import com.highload.chatic.ChaticApplicationTests;
 import com.highload.chatic.dto.message.MessageRequestDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
@@ -14,7 +15,9 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class MessageControllerIT extends ChaticApplicationTests {
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("integration-test")
+public class MessageControllerIT {
     private static final String USER31 = "Bearer eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ1c2VyMzEiLCJzY29wZSI6IlVTRVIifQ.DU1nndJ1zvG5mhm_mpCj2Dqir3N51x4kCi8kRU1fg1Yvy79HFh3DqJRHP9C65WHfpOXZ6qHQPQd-7epr8Wkf_GBdEj3l72XoUdqs23GWjoO21f6Tz7cwgCxietYUI9MEBTJGn7myJoyXDXJHalR2bTcAh6MVfQ3OZmDWE1soJyrpuwKy-IPFTB72hcOpjKcFnESn0_RMSWHoTdAuSQlpr57y1x9kmQPn3p2vyjtQT7K1Ji7qfclPf8LENi86xEqPPIIqipojCg3bfl3HYKXr7oUEXKuZXDRxtfPgY2R1wX3_lbafuqvjHAH94Waj76JK2PxL8WbJth8FYcVWPKigdQ";
     private static final String USER32 = "Bearer eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ1c2VyMzIiLCJzY29wZSI6IlVTRVIifQ.iNo-bQvFyYGz0AJcvv9EkKBXB8V0X20ZkllKDkKU-uKCDgIYTYCV11wCCxQ_OeYH0lkKq326fUCgHksR_2_zTAdDCt_bE2wfvGjiXCTOqJC5lW5d7J-aZYPiwmGadS0VONBafLlJEcd9FERvK23Yw5FCuiYuvMJA-qcwjxd8zcn60E5yDyTqLJFXSU9UNZREBlyoIbdb8vtVRP3HaNUks5DZGnwQm4pcZiv_FChkqgmneX12XrZgoZRZ3D959kPvmnrg5YNpyhmvVG7vLvO3JBoJnvovggTYlP1FncOQvL1Blp9vmEeOXRqmX8mSfiSiZHSb9SFpD0RC4OtwoC9P-A";
     private static final String USER33 = "Bearer eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ1c2VyMzMiLCJzY29wZSI6IlVTRVIifQ.Pl1nY_qMCLGG1rhtOqPuQnfrp5so20q79pxRSR1Mh1uWXpwkAPA1jgz6W0iVruc-fZRn_Jsd5VCQS1XJyNsxG1bYhzbWl20_cL1G70I_JZ6bb0r9yfqdYQb1imZ7y7Fp7jsqyG5eVUGmxdEGyeyd1TqzaHgUzAS4RsbOcmSfmjfcPDHUhy1CxSYhCPboW7_gPZy7z8OCSNKFoP8vGhlXPTpMZU5PXPqfwCWEN8V645DMjLPKMNfbrU_RPcDaPRRF4khw6M6Vc8FmfvFtKsKcrLLyh5vjQICOvtFvjTVjHrO8632rK2zw43pOxZCe_WzrJSrdroOA4lhTFhgFnNTTGQ";

@@ -7,5 +7,3 @@ databaseChangeLog:
       file: db/changelog/V0_3/V0_3_message_content.sql
   - include:
       file: db/changelog/V0_4/V0_4_single_personal_chat_constraint.sql
-  - include:
-      file: db/changelog/V0_5/V0_5_test_data.sql

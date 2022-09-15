@@ -18,3 +18,7 @@ spring:
 rsa:
   private-key: classpath:certs/private.pem
   public-key: classpath:certs/public.pem
+
+embedded:
+  postgresql:
+    enabled: false
