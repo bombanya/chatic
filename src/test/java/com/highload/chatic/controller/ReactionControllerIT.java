@@ -163,8 +163,6 @@ public class ReactionControllerIT {
     }
 
 
-
-
     @Test
     public void deleteReaction() throws URISyntaxException {
         String messageId = "c2b57b8e-146a-4f7b-b207-a17b8d24744b";

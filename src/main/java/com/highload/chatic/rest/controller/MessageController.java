@@ -53,14 +53,12 @@ public class MessageController {
         return service.getMessage(principal.getName(), messageId);
     }
 
-    @GetMapping()
+    @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public PageResponseDto<MessageResponseDto> getMessages(
-            @RequestParam() UUID chatId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            Principal principal
-    ) {
+    public PageResponseDto<MessageResponseDto> getMessages(@RequestParam UUID chatId,
+                                                           @RequestParam(defaultValue = "0") int page,
+                                                           @RequestParam(defaultValue = "10") int size,
+                                                           Principal principal) {
         return service.getChatMessages(principal.getName(), chatId, PageRequest.of(page, size));
     }
 

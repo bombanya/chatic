@@ -14,6 +14,7 @@ public class Chat {
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid2")
     private UUID id;
+
     public Chat(UUID id) {
         this.id = id;
     }

@@ -309,7 +309,6 @@ public class MessageControllerIT {
     }
 
 
-
     @Test
     public void deleteMessage() throws URISyntaxException {
         String messageId = "c2b57b8e-146a-4f7b-b207-a17b8d24744b";
@@ -378,7 +377,6 @@ public class MessageControllerIT {
     }
 
 
-
     @Test
     public void getMessage() throws URISyntaxException {
         String messageId = "cdf6d98f-e42d-41ce-be0c-6431af9f7dda";
@@ -428,7 +426,6 @@ public class MessageControllerIT {
                 uri, HttpMethod.GET, requestEntity, String.class);
         assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
     }
-
 
 
     @Test
@@ -497,7 +494,6 @@ public class MessageControllerIT {
                 builder.build().encode().toUri(), HttpMethod.GET, requestEntity, String.class);
         assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
     }
-
 
 
     @Test

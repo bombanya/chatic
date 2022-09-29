@@ -2,7 +2,6 @@ package com.highload.chatic.controller;
 
 import com.highload.chatic.dto.person.PersonRequestDto;
 import com.highload.chatic.models.AuthRoleName;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,7 +76,7 @@ public class PersonControllerIT {
         personRequestDto.setAuthRole(AuthRoleName.USER);
         HttpEntity<PersonRequestDto> requestEntity = new HttpEntity<>(personRequestDto);
 
-        ResponseEntity<String> response = restTemplate.exchange(baseUrl  + "/persons",
+        ResponseEntity<String> response = restTemplate.exchange(baseUrl + "/persons",
                 HttpMethod.POST, requestEntity, String.class);
         assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
     }

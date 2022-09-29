@@ -35,13 +35,13 @@ public class PersonalChatServiceImpl implements PersonalChatService {
     public PersonalChatResponseDto addChat(String username1, String username2) {
         var person1 = personService.getPerson(username1);
         var person2 = personService.getPerson(username2);
-        if(personalChatRepository
+        if (personalChatRepository
                 .findByPerson1IdAndPerson2Id(person1.getId(), person2.getId()).isPresent())
             throw new InvalidRequestException();
         var personalChat = personalChatRepository
                 .findByPerson1IdAndPerson2Id(person1.getId(), person2.getId())
                 .orElseGet(() -> personalChatRepository
-                            .save(new PersonalChat(person1.getId(), person2.getId())));
+                        .save(new PersonalChat(person1.getId(), person2.getId())));
         return modelMapper.map(personalChat, PersonalChatResponseDto.class);
     }
 

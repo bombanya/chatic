@@ -16,7 +16,7 @@ import java.security.Principal;
 @RestController
 @RequiredArgsConstructor
 @Validated
-@RequestMapping("persons")
+@RequestMapping("/persons")
 public class PersonController {
 
     private final PersonService personService;

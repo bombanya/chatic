@@ -1,6 +1,5 @@
 package com.highload.chatic.controller;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,9 +23,6 @@ public class AuthControllerIT {
 
     @LocalServerPort
     private int port;
-
-    @AfterEach
-    void tearDown() {}
 
     public ResponseEntity<?> sendAuth(String username, String password) {
         String baseUrl = "http://localhost:" + port + "/login";

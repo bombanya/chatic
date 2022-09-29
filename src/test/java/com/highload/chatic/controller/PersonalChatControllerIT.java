@@ -94,7 +94,7 @@ public class PersonalChatControllerIT {
         ResponseEntity<Map> response = restTemplate.exchange(
                 builder.build().encode().toUri(), HttpMethod.GET, requestEntity, Map.class);
 
-        assertTrue( (int) response.getBody().get("totalPages") > 0);
+        assertTrue((int) response.getBody().get("totalPages") > 0);
     }
 
     @Test
@@ -114,7 +114,7 @@ public class PersonalChatControllerIT {
         ResponseEntity<Map> response = restTemplate.exchange(
                 builder.build().encode().toUri(), HttpMethod.GET, requestEntity, Map.class);
 
-        assertTrue( (int) response.getBody().get("totalPages") == 0);
+        assertTrue((int) response.getBody().get("totalPages") == 0);
     }
 
     @Test
@@ -134,8 +134,6 @@ public class PersonalChatControllerIT {
 
         assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
     }
-
-
 
 
     @Test

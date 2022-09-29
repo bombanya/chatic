@@ -22,7 +22,7 @@ public class ReactionController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public PageResponseDto<ReactionResponseDto> getReactions (
+    public PageResponseDto<ReactionResponseDto> getReactions(
             @PathVariable UUID messageId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,

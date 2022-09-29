@@ -1,12 +1,10 @@
 package com.highload.chatic.models;
 
 import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -36,7 +34,7 @@ public class Person {
     @Enumerated(EnumType.STRING)
     private AuthRoleName authRole;
 
-//    @OneToMany(mappedBy = "person")
+    //    @OneToMany(mappedBy = "person")
 //    private List<Device> devices;
     public Person(String username, String password, String bio) {
         this.username = username;

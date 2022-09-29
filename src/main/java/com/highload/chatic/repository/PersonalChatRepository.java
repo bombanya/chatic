@@ -14,14 +14,14 @@ import java.util.UUID;
 public interface PersonalChatRepository extends JpaRepository<PersonalChat, UUID> {
     @Query(
             "select chat from PersonalChat chat " +
-            "where chat.person1Id = :personId or chat.person2Id = :personId"
+                    "where chat.person1Id = :personId or chat.person2Id = :personId"
     )
     Page<PersonalChat> findAllUserChats(UUID personId, Pageable pageable);
 
 
     @Query(
             "select chat from PersonalChat chat " +
-            "where chat.id = :id and chat.person1Id <> :userId and chat.person2Id <> :userId"
+                    "where chat.id = :id and chat.person1Id <> :userId and chat.person2Id <> :userId"
     )
     boolean isNotUserChat(UUID id, UUID userId);
 

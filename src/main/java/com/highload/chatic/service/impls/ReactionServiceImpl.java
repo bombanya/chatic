@@ -36,7 +36,7 @@ public class ReactionServiceImpl implements ReactionService {
     public void deleteReaction(String username, UUID messageId) {
         var person = personService.getPerson(username);
         reactionRepository.findById(new ReactionId(messageId, person.getId()))
-                        .orElseThrow(ResourceNotFoundException::new);
+                .orElseThrow(ResourceNotFoundException::new);
         reactionRepository.deleteById(new ReactionId(messageId, person.getId()));
     }
 
