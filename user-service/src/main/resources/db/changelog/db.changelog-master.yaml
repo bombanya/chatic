@@ -1,0 +1,5 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/V0_1/V0_1_create_tables.sql
+  - include:
+      file: db/changelog/V0_2/V0_2_security.sql
