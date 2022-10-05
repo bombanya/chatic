@@ -1,29 +1,14 @@
-
+server:
+  port: 0
 
 spring:
-  datasource:
-    driverClassName: org.postgresql.Driver
-    url: jdbc:postgresql://${DB_HOST:localhost}:${POSTGRES_DOCKER_PORT:5432}/${POSTGRES_DB:user-service}
-    username: ${POSTGRES_USER:postgres}
-    password: ${POSTGRES_PASSWORD:postgres}
-
-    jpa:
-      properties:
-        hibernate:
-          dialect: org.hibernate.dialect.PostgreSQL10Dialect
-          show_sql: true
-          hbm2ddl:
-            auto: validate
-      show-sql: true
-      generate-ddl: false
-
+  config:
+    import: configserver:http://localhost:8001
   application:
-    name: user-service
+    name: person-service
 
-server:
-  port: 8002
-
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8000/eureka/
+person:
+  repository:
+    find-by-id: select * from person where person.id = :id
+    find-by-username: select * from person where person.username = :username
+    delete-by-id: update person set deleted = true where person.id = :id
