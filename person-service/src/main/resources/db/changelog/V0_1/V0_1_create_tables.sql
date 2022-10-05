@@ -5,7 +5,10 @@ CREATE TABLE Person
 (
     id       uuid PRIMARY KEY,
     username varchar(20) NOT NULL UNIQUE,
-    bio      varchar(70)
+    password text NOT NULL,
+    auth_role text NOT NULL,
+    bio      varchar(70),
+    deleted  bool NOT NULL
 );
 --rollback DROP TABLE Person;
 
