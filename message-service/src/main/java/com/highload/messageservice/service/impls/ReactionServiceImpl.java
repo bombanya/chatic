@@ -1,5 +1,6 @@
 package com.highload.messageservice.service.impls;
 
+import com.highload.messageservice.client.PersonFeignClient;
 import com.highload.messageservice.dto.PageResponseDto;
 import com.highload.messageservice.dto.reaction.ReactionRequestDto;
 import com.highload.messageservice.dto.reaction.ReactionResponseDto;
@@ -9,7 +10,6 @@ import com.highload.messageservice.models.Reaction;
 import com.highload.messageservice.models.ReactionId;
 import com.highload.messageservice.repository.ReactionRepository;
 import com.highload.messageservice.service.MessageService;
-import com.highload.messageservice.service.PersonService;
 import com.highload.messageservice.service.ReactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -22,7 +22,7 @@ import java.util.UUID;
 public class ReactionServiceImpl implements ReactionService {
 
     private final ReactionRepository reactionRepository;
-    private final PersonService personService;
+    private final PersonFeignClient personService;
     private final MessageService messageService;
 
     @Override

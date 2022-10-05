@@ -2,6 +2,8 @@ package com.highload.chatservice.rest.controller;
 
 import com.highload.chatservice.dto.PageResponseDto;
 import com.highload.chatservice.dto.personalchat.PersonalChatResponseDto;
+import com.highload.chatservice.models.MessageOperation;
+import com.highload.chatservice.service.ChatService;
 import com.highload.chatservice.service.PersonalChatService;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -10,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -17,6 +20,7 @@ import java.security.Principal;
 public class PersonalChatController {
 
     private final PersonalChatService service;
+    private final ChatService chatService;
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
@@ -48,4 +52,12 @@ public class PersonalChatController {
         return service.addChat(principal.getName(), username);
     }
 
+    @GetMapping("/{chatId}/{personId}/{operation}")
+    public void authorizeOperation(
+            @PathVariable UUID chatId,
+            @PathVariable UUID personId,
+            @PathVariable MessageOperation operation
+    ) {
+        chatService.authorizeOperation(chatId, personId, operation);
+    }
 }

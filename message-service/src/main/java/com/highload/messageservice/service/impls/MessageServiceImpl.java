@@ -1,5 +1,7 @@
 package com.highload.messageservice.service.impls;
 
+import com.highload.messageservice.client.ChatFeignClient;
+import com.highload.messageservice.client.PersonFeignClient;
 import com.highload.messageservice.dto.PageResponseDto;
 import com.highload.messageservice.dto.message.MessageRequestDto;
 import com.highload.messageservice.dto.message.MessageResponseDto;
@@ -11,9 +13,7 @@ import com.highload.messageservice.models.MessageContent;
 import com.highload.messageservice.models.MessageOperation;
 import com.highload.messageservice.repository.MessageContentRepository;
 import com.highload.messageservice.repository.MessageRepository;
-import com.highload.messageservice.service.ChatService;
 import com.highload.messageservice.service.MessageService;
-import com.highload.messageservice.service.PersonService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -27,8 +27,8 @@ public class MessageServiceImpl implements MessageService {
 
     private final MessageRepository messageRepository;
     private final MessageContentRepository messageContentRepository;
-    private final PersonService personService;
-    private final ChatService chatService;
+    private final PersonFeignClient personService;
+    private final ChatFeignClient chatService;
 
     @Override
     @Transactional
