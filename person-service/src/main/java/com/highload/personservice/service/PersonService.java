@@ -1,5 +1,6 @@
 package com.highload.personservice.service;
 
+import com.highload.personservice.dto.person.PersonAuthDto;
 import com.highload.personservice.dto.person.PersonRequestDto;
 import com.highload.personservice.dto.person.PersonResponseDto;
 
@@ -9,6 +10,8 @@ public interface PersonService {
     PersonResponseDto getPerson(UUID personId);
 
     PersonResponseDto getPerson(String username);
+
+    PersonAuthDto getPersonForAuth(String username);
 
     void addPerson(PersonRequestDto personRequestDto);
 

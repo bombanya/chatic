@@ -11,7 +11,3 @@ spring:
           search-locations: classpath:/config
   application:
     name: config-server
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8000/eureka

@@ -11,7 +11,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.security.Principal;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,22 +21,25 @@ public class PersonController {
     private final PersonService personService;
 
     @PostMapping
-    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
     @Validated(AddRequest.class)
-    public void addPerson(@RequestBody @Valid PersonRequestDto personRequestDto) {
+    @PreAuthorize("#role == 'SCOPE_ADMIN'")
+    public void addPerson(@RequestBody @Valid PersonRequestDto personRequestDto,
+                          @RequestHeader("ROLE") String role) {
         personService.addPerson(personRequestDto);
     }
 
-    @GetMapping("{username}")
+    @GetMapping("/{username}")
     @ResponseStatus(HttpStatus.OK)
     public PersonResponseDto getPerson(@PathVariable String username) {
         return personService.getPerson(username);
     }
 
-    @DeleteMapping("{username}")
-    @PreAuthorize("hasAuthority('SCOPE_ADMIN') or #username == #principal.name")
-    public void deletePerson(@PathVariable String username, Principal principal) {
+    @DeleteMapping("/{username}")
+    @PreAuthorize("#role == 'SCOPE_ADMIN' or #username == #name")
+    public void deletePerson(@PathVariable String username,
+                             @RequestHeader("ROLE") String role,
+                             @RequestHeader("USERNAME") String name) {
         personService.deletePerson(username);
     }
 }
