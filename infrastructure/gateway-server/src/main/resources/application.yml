@@ -1,0 +1,20 @@
+server:
+  port: 8080
+
+rsa:
+  private-key: classpath:certs/private.pem
+  public-key: classpath:certs/public.pem
+
+spring:
+  config:
+    import: configserver:http://localhost:8001
+  application:
+    name: gateway-server
+
+  cloud:
+    gateway:
+      routes:
+        - id: person_service_route
+          uri: lb://person-service
+          predicates:
+            - Path=/persons/**

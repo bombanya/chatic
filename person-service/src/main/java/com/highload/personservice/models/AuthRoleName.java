@@ -1,22 +1,8 @@
 package com.highload.personservice.models;
 
-import org.springframework.security.core.GrantedAuthority;
 
-import java.util.Collection;
-
-public enum AuthRoleName implements GrantedAuthority {
+public enum AuthRoleName {
     ADMIN,
-    USER;
+    USER
 
-    public static boolean isNotSuperUser(Collection<? extends GrantedAuthority> authorities) {
-        return authorities.stream()
-                .map(GrantedAuthority::getAuthority)
-                .map(AuthRoleName::valueOf)
-                .noneMatch(AuthRoleName.ADMIN::equals);
-    }
-
-    @Override
-    public String getAuthority() {
-        return toString();
-    }
 }

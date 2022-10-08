@@ -3,13 +3,11 @@ package com.highload.personservice.dto.person;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.UUID;
-
 @Getter
 @Setter
-public class PersonResponseDto {
-    private UUID id;
+public class PersonAuthDto {
+
     private String username;
-    private String bio;
-    private boolean deleted;
+    private String password;
+    private String authRole;
 }
