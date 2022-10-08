@@ -2,7 +2,6 @@ package com.highload.messageservice.service.impls;
 
 import com.highload.messageservice.client.ChatFeignClient;
 import com.highload.messageservice.client.PersonFeignClient;
-import com.highload.messageservice.dto.PageResponseDto;
 import com.highload.messageservice.dto.message.MessageRequestDto;
 import com.highload.messageservice.dto.message.MessageResponseDto;
 import com.highload.messageservice.exception.IllegalAccessException;
@@ -15,8 +14,10 @@ import com.highload.messageservice.repository.MessageContentRepository;
 import com.highload.messageservice.repository.MessageRepository;
 import com.highload.messageservice.service.MessageService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import javax.transaction.Transactional;
 import java.util.UUID;
@@ -32,90 +33,107 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     @Transactional
-    public void updateMessage(String username, UUID messageID, MessageRequestDto messageRequestDto) {
+    public Mono<MessageContent> updateMessage(String username, UUID messageID, MessageRequestDto messageRequestDto) {
         var person = personService.getPerson(username);
         checkPersonIsAuthor(person.getId(), messageID);
-        messageContentRepository.updateMessageContent(messageID, messageRequestDto.textContent());
+        return messageContentRepository.findById(messageID)
+                .flatMap(s -> {
+                    s.setText(messageRequestDto.textContent());
+                    return messageContentRepository.save(s);
+                });
     }
 
     @Override
-    public void deleteMessage(String username, UUID messageId) {
+    public Mono<Void> deleteMessage(String username, UUID messageId) {
         var person = personService.getPerson(username);
         checkPersonIsAuthor(person.getId(), messageId);
-        messageRepository.deleteById(messageId);
+        return messageRepository.deleteById(messageId);
     }
 
     @Override
     @Transactional
-    public void addMessage(String username, MessageRequestDto messageRequestDto) {
+    public Mono<Void> addMessage(String username, MessageRequestDto messageRequestDto) {
         var person = personService.getPerson(username);
         chatService.authorizeOperation(messageRequestDto.chatId(), person.getId(), MessageOperation.WRITE);
         Message message = new Message(messageRequestDto.chatId(), person.getId(), null);
-        messageRepository.save(message);
-        messageContentRepository.save(new MessageContent(message.getId(), messageRequestDto.textContent()));
+        return messageRepository.save(message)
+                .and(
+                        messageContentRepository.save(new MessageContent(message.getId(), messageRequestDto.textContent()))
+                );
     }
 
     @Override
     @Transactional
-    public void addReply(String username, UUID replyId, MessageRequestDto messageRequestDto) {
+    public Mono<Void> addReply(String username, UUID replyId, MessageRequestDto messageRequestDto) {
         var person = personService.getPerson(username);
         chatService.authorizeOperation(messageRequestDto.chatId(), person.getId(), MessageOperation.REPLY);
-        messageRepository.findById(replyId).orElseThrow(InvalidRequestException::new);
+        messageRepository.findById(replyId).switchIfEmpty(Mono.error(InvalidRequestException::new));//todo
         Message message = new Message(messageRequestDto.chatId(), person.getId(), replyId);
-        messageRepository.save(message);
-        messageContentRepository.save(new MessageContent(message.getId(), messageRequestDto.textContent()));
+        return messageRepository.save(message)
+                .and(
+                        messageContentRepository.save(new MessageContent(message.getId(), messageRequestDto.textContent()))
+                );
     }
 
     @Override
-    public MessageResponseDto getMessage(String username, UUID messageId) {
+    public Mono<MessageResponseDto> getMessage(String username, UUID messageId) {
         var person = personService.getPerson(username);
-        var message = messageRepository.findById(messageId).orElseThrow(ResourceNotFoundException::new);
-        chatService.authorizeOperation(message.getChatId(), person.getId(), MessageOperation.READ);
-        var content = messageContentRepository.findByMessageId(messageId)
-                .orElseThrow(ResourceNotFoundException::new);
-        return MessageResponseDto.fromMessageWithContent(message, content);
+        messageRepository.findById(messageId)
+                .subscribe(msg->chatService.authorizeOperation(msg.getChatId(), person.getId(), MessageOperation.READ));
+
+        return messageRepository.findById(messageId)
+                .zipWith(messageContentRepository.findByMessageId(messageId))
+                .map(
+                        mes -> MessageResponseDto.fromMessageWithContent(mes.getT1(), mes.getT2().get())
+                );
+
     }
 
     @Override
-    public PageResponseDto<MessageResponseDto> getChatMessages(String username, UUID chatId, Pageable pageable) {
+    public Mono<PageImpl<Object>> getChatMessages(String username, UUID chatId, Pageable pageable) {
         var person = personService.getPerson(username);
         chatService.authorizeOperation(chatId, person.getId(), MessageOperation.READ);
-        var messages = messageRepository.findAllByChatIdOrderByTimestampDesc(chatId, pageable);
-        var contents = messageContentRepository.findByMessageIdIn(messages
-                .getContent()
-                .stream()
-                .map(Message::getId)
-                .toList());
-        return new PageResponseDto<>(MessageResponseDto.fromMessagesWithContent(messages.getContent(), contents),
-                messages);
+        return messageRepository.findAllByChatIdOrderByTimestampDesc(chatId, pageable)
+                .collectList()
+                .map(
+                        messages1 -> messageContentRepository.findByMessageIdIn(messages1.stream().map(Message::getId).toList())
+                )
+                .zipWith(this.messageRepository.count())
+                .map(t -> new PageImpl<>(t.toList(), pageable, t.getT2()));
+
     }
 
     @Override
-    public PageResponseDto<MessageResponseDto> getMessageReplies(String username, UUID messageId, Pageable pageable) {
+    public Mono<PageImpl<Object>> getMessageReplies(String username, UUID messageId, Pageable pageable) {
         var person = personService.getPerson(username);
-        var message = messageRepository.findById(messageId).orElseThrow(ResourceNotFoundException::new);
-        chatService.authorizeOperation(message.getChatId(), person.getId(), MessageOperation.READ);
-        var messages = messageRepository.findAllByReplyIdOrderByTimestampDesc(messageId, pageable);
-        var contents = messageContentRepository.findByMessageIdIn(messages
-                .getContent()
-                .stream()
-                .map(Message::getId)
-                .toList());
-        return new PageResponseDto<>(MessageResponseDto.fromMessagesWithContent(messages.getContent(), contents),
-                messages);
+        messageRepository.findById(messageId)
+                        .subscribe(msg -> chatService.authorizeOperation(msg.getChatId(), person.getId(), MessageOperation.READ));
+
+        return messageRepository.findAllByReplyIdOrderByTimestampDesc(messageId, pageable)
+                .collectList()
+                .map(
+                        messages1 -> messageContentRepository.findByMessageIdIn(messages1.stream().map(Message::getId).toList())
+                )
+                .zipWith(this.messageRepository.count())
+                .map(t -> new PageImpl<>(t.toList(), pageable, t.getT2()));
     }
 
     @Override
     public void authorizeOperationOnMessage(UUID messageId, UUID personId, MessageOperation operation) {
-        var message = messageRepository.findById(messageId)
-                .orElseThrow(ResourceNotFoundException::new);
-        if (operation == MessageOperation.WRITE) throw new IllegalAccessException();
-        chatService.authorizeOperation(message.getChatId(), personId, operation);
+        messageRepository.findById(messageId)
+                .switchIfEmpty(Mono.error(new ResourceNotFoundException()))
+                .subscribe(m -> {
+                    if (operation == MessageOperation.WRITE)
+                        throw new IllegalAccessException();
+                    else
+                        chatService.authorizeOperation(m.getChatId(), personId, operation);//todo
+                });
     }
 
     private void checkPersonIsAuthor(UUID personId, UUID messageId) {
-        var message = messageRepository.findById(messageId)
-                .orElseThrow(ResourceNotFoundException::new);
-        if (!message.getAuthorId().equals(personId)) throw new ResourceNotFoundException();
+        messageRepository.findById(messageId)
+                .subscribe(msg -> {
+                    if (!msg.getAuthorId().equals(personId)) throw new ResourceNotFoundException();
+                });
     }
 }

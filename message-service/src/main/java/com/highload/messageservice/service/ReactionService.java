@@ -1,16 +1,17 @@
 package com.highload.messageservice.service;
 
-import com.highload.messageservice.dto.PageResponseDto;
 import com.highload.messageservice.dto.reaction.ReactionRequestDto;
-import com.highload.messageservice.dto.reaction.ReactionResponseDto;
+import com.highload.messageservice.models.Reaction;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
 public interface ReactionService {
-    void addReaction(String username, UUID messageId, ReactionRequestDto reactionRequestDto);
+    Mono<Reaction> addReaction(String username, UUID messageId, ReactionRequestDto reactionRequestDto);
 
-    void deleteReaction(String username, UUID messageId);
+    Mono<Void> deleteReaction(String username, UUID messageId);
 
-    PageResponseDto<ReactionResponseDto> getReactions(String username, UUID messageId, Pageable pageable);
+    Mono<PageImpl<Reaction>> getReactions(String username, UUID messageId, Pageable pageable);
 }

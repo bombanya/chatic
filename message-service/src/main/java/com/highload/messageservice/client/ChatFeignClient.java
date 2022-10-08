@@ -9,10 +9,10 @@ import java.util.UUID;
 
 @FeignClient("chat-service")
 public interface ChatFeignClient {
-    @GetMapping("/{chatId}/{personId}/{operation}")
+    @GetMapping("/personal-chats/{chatId}/{personId}/{operation}")
     void authorizeOperation(
-            @PathVariable(value = "chatId") UUID chatId,
-            @PathVariable(value = "personId") UUID personId,
-            @PathVariable(value = "operation") MessageOperation operation
+            @PathVariable UUID chatId,
+            @PathVariable UUID personId,
+            @PathVariable MessageOperation operation
     );
 }
