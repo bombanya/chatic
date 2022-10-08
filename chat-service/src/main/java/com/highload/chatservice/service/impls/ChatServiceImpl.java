@@ -26,7 +26,7 @@ public class ChatServiceImpl implements ChatService {
         var chat = chatRepository.findById(chatId).orElseThrow(ResourceNotFoundException::new);
         if (chat instanceof PersonalChat) authorizeInPersonalChat(personId, (PersonalChat) chat);
         else if (chat instanceof PGroup)
-            authorizeInGroup(groupService.getGroupMemberInfo(chatId, personId), operation);
+            authorizeInGroup(groupService.getGroupMemberInfo(chatId, personId).block(), operation);
         else throw new IllegalAccessException();
     }
 

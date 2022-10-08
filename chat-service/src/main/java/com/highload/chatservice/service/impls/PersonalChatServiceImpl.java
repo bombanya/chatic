@@ -1,56 +1,62 @@
 package com.highload.chatservice.service.impls;
 
-import com.highload.chatservice.dto.PageResponseDto;
 import com.highload.chatservice.dto.personalchat.PersonalChatResponseDto;
-import com.highload.chatservice.exception.InvalidRequestException;
-import com.highload.chatservice.exception.ResourceNotFoundException;
 import com.highload.chatservice.models.PersonalChat;
 import com.highload.chatservice.repository.PersonalChatRepository;
-import com.highload.chatservice.service.PersonService;
 import com.highload.chatservice.service.PersonalChatService;
+import com.highload.chatservice.client.PersonFeignClient;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 @Service
 @RequiredArgsConstructor
 public class PersonalChatServiceImpl implements PersonalChatService {
 
     private final PersonalChatRepository personalChatRepository;
-    private final PersonService personService;
+    private final PersonFeignClient personService;
     private final ModelMapper modelMapper;
 
     @Override
-    public PersonalChatResponseDto getChat(String username1, String username2) {
+    public Mono<PersonalChatResponseDto> getChat(String username1, String username2) {
         var person1 = personService.getPerson(username1);
         var person2 = personService.getPerson(username2);
-        var personalChat = personalChatRepository
+        /*var personalChat = personalChatRepository
                 .findByPerson1IdAndPerson2Id(person1.getId(), person2.getId())
                 .orElseThrow(ResourceNotFoundException::new);
-        return modelMapper.map(personalChat, PersonalChatResponseDto.class);
+        return modelMapper.map(personalChat, PersonalChatResponseDto.class);*/
+        return personalChatRepository.findByPerson1IdAndPerson2Id(person1.getId(), person2.getId())
+                .map(
+                        ch -> modelMapper.map(ch, PersonalChatResponseDto.class)
+                );
     }
 
     @Override
-    public PersonalChatResponseDto addChat(String username1, String username2) {
+    public Mono<PersonalChat> addChat(String username1, String username2) {
         var person1 = personService.getPerson(username1);
         var person2 = personService.getPerson(username2);
-        if (personalChatRepository
-                .findByPerson1IdAndPerson2Id(person1.getId(), person2.getId()).isPresent())
-            throw new InvalidRequestException();
-        var personalChat = personalChatRepository
+        /*var personalChat = personalChatRepository
                 .findByPerson1IdAndPerson2Id(person1.getId(), person2.getId())
                 .orElseGet(() -> personalChatRepository
-                        .save(new PersonalChat(person1.getId(), person2.getId())));
-        return modelMapper.map(personalChat, PersonalChatResponseDto.class);
+                        .save(new PersonalChat(person1.getId(), person2.getId())));*/
+        return personalChatRepository.save(new PersonalChat(person1.getId(), person2.getId()));
     }
 
     @Override
-    public PageResponseDto<PersonalChatResponseDto> getAllChats(String username, Pageable pageable) {
+    public Mono<PageImpl<PersonalChat>> getAllChats(String username, Pageable pageable) {
         var user = personService.getPerson(username);
-        var page = personalChatRepository
+
+        return personalChatRepository.findAllUserChats(user.getId(), pageable)
+                .collectList()
+                .zipWith(this.personalChatRepository.count())
+                .map(t -> new PageImpl<>(t.getT1(), pageable, t.getT2()));
+
+        /*var page = personalChatRepository
                 .findAllUserChats(user.getId(), pageable)
                 .map(it -> modelMapper.map(it, PersonalChatResponseDto.class));
-        return new PageResponseDto<>(page);
+        return new PageResponseDto<>(page);*/
     }
 }

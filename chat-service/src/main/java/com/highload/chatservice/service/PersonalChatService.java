@@ -1,13 +1,15 @@
 package com.highload.chatservice.service;
 
-import com.highload.chatservice.dto.PageResponseDto;
 import com.highload.chatservice.dto.personalchat.PersonalChatResponseDto;
+import com.highload.chatservice.models.PersonalChat;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import reactor.core.publisher.Mono;
 
 public interface PersonalChatService {
-    PersonalChatResponseDto getChat(String username1, String username2);
+    Mono<PersonalChatResponseDto> getChat(String username1, String username2);
 
-    PageResponseDto<PersonalChatResponseDto> getAllChats(String username, Pageable pageable);
+    Mono<PageImpl<PersonalChat>> getAllChats(String username, Pageable pageable);
 
-    PersonalChatResponseDto addChat(String username1, String username2);
+    Mono<PersonalChat> addChat(String username1, String username2);
 }
