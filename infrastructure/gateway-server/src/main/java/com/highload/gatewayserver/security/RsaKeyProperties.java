@@ -1,4 +1,4 @@
-package com.highload.gatewayserver;
+package com.highload.gatewayserver.security;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

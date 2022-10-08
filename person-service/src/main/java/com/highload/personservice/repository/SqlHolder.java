@@ -6,6 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public record SqlHolder(
         String findById,
         String findByUsername,
-        String deleteById
+        String deleteById,
+        String findByUsernameAuth
 ) {
 }

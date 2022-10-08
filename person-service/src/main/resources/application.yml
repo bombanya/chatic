@@ -12,3 +12,4 @@ person:
     find-by-id: select * from person where person.id = :id
     find-by-username: select * from person where person.username = :username
     delete-by-id: update person set deleted = true where person.id = :id
+    find-by-username-auth: select * from person where person.username = :username and not person.deleted

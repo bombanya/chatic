@@ -1,5 +1,6 @@
 package com.highload.personservice.service.impls;
 
+import com.highload.personservice.dto.person.PersonAuthDto;
 import com.highload.personservice.dto.person.PersonRequestDto;
 import com.highload.personservice.dto.person.PersonResponseDto;
 import com.highload.personservice.exception.ResourceNotFoundException;
@@ -33,6 +34,13 @@ public class PersonServiceImpl implements PersonService {
         var person = personRepository.findByUsername(username)
                 .orElseThrow(ResourceNotFoundException::new);
         return modelMapper.map(person, PersonResponseDto.class);
+    }
+
+    @Override
+    public PersonAuthDto getPersonForAuth(String username) {
+        var person = personRepository.findByUsernameForAuth(username)
+                .orElseThrow(ResourceNotFoundException::new);
+        return modelMapper.map(person, PersonAuthDto.class);
     }
 
     @Override

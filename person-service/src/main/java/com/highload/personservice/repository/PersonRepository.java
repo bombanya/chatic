@@ -40,6 +40,13 @@ public class PersonRepository {
                 .findFirst();
     }
 
+    public Optional<Person> findByUsernameForAuth(String username) {
+        return jdbcTemplate.queryForStream(sqlHolder.findByUsernameAuth(),
+                Map.of("username", username),
+                personRowMapper)
+                .findFirst();
+    }
+
     public void save(Person person) {
         person.setId(UUID.randomUUID());
         jdbcInsert.withTableName("person")
