@@ -26,21 +26,21 @@ public class ReactionServiceImpl implements ReactionService {
 
     @Override
     public Mono<Reaction> addReaction(String username, UUID messageId, ReactionRequestDto reactionRequestDto) {
-        var person = personService.getPerson(username);
+        var person = personService.getPerson(username).block();
         messageService.authorizeOperationOnMessage(messageId, person.getId(), MessageOperation.READ);
         return reactionRepository.save(new Reaction(messageId, person.getId(), reactionRequestDto.getEmoji()));
     }
 
     @Override
     public Mono<Void> deleteReaction(String username, UUID messageId) {
-        var person = personService.getPerson(username);
+        var person = personService.getPerson(username).block();
         return reactionRepository.deleteById(new ReactionId(messageId, person.getId()));
     }
 
     @Override
     public Mono<PageImpl<Reaction>> getReactions(String username, UUID messageId, Pageable pageable) {
-        var person = personService.getPerson(username);
-        messageService.authorizeOperationOnMessage(messageId, person.getId(), MessageOperation.READ);
+        personService.getPerson(username)
+                .subscribe(p -> messageService.authorizeOperationOnMessage(messageId, p.getId(), MessageOperation.READ));
 
         return reactionRepository.findByReactionId_MessageId(messageId, pageable)
                 .collectList()

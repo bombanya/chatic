@@ -34,8 +34,8 @@ public class MessageServiceImpl implements MessageService {
     @Override
     @Transactional
     public Mono<MessageContent> updateMessage(String username, UUID messageID, MessageRequestDto messageRequestDto) {
-        var person = personService.getPerson(username);
-        checkPersonIsAuthor(person.getId(), messageID);
+        personService.getPerson(username)
+                        .subscribe(personResponseDto -> checkPersonIsAuthor(personResponseDto.getId(), messageID));
         return messageContentRepository.findById(messageID)
                 .flatMap(s -> {
                     s.setText(messageRequestDto.textContent());
@@ -45,15 +45,15 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public Mono<Void> deleteMessage(String username, UUID messageId) {
-        var person = personService.getPerson(username);
-        checkPersonIsAuthor(person.getId(), messageId);
+        personService.getPerson(username)
+                .subscribe(personResponseDto -> checkPersonIsAuthor(personResponseDto.getId(), messageId));
         return messageRepository.deleteById(messageId);
     }
 
     @Override
     @Transactional
     public Mono<Void> addMessage(String username, MessageRequestDto messageRequestDto) {
-        var person = personService.getPerson(username);
+        var person = personService.getPerson(username).block();
         chatService.authorizeOperation(messageRequestDto.chatId(), person.getId(), MessageOperation.WRITE);
         Message message = new Message(messageRequestDto.chatId(), person.getId(), null);
         return messageRepository.save(message)
@@ -65,7 +65,7 @@ public class MessageServiceImpl implements MessageService {
     @Override
     @Transactional
     public Mono<Void> addReply(String username, UUID replyId, MessageRequestDto messageRequestDto) {
-        var person = personService.getPerson(username);
+        var person = personService.getPerson(username).block();
         chatService.authorizeOperation(messageRequestDto.chatId(), person.getId(), MessageOperation.REPLY);
         messageRepository.findById(replyId).switchIfEmpty(Mono.error(InvalidRequestException::new));//todo
         Message message = new Message(messageRequestDto.chatId(), person.getId(), replyId);
@@ -77,9 +77,9 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public Mono<MessageResponseDto> getMessage(String username, UUID messageId) {
-        var person = personService.getPerson(username);
-        messageRepository.findById(messageId)
-                .subscribe(msg->chatService.authorizeOperation(msg.getChatId(), person.getId(), MessageOperation.READ));
+        personService.getPerson(username)
+                .zipWith(messageRepository.findById(messageId))
+                .subscribe(tuple->chatService.authorizeOperation(tuple.getT2().getChatId(), tuple.getT1().getId(), MessageOperation.READ));
 
         return messageRepository.findById(messageId)
                 .zipWith(messageContentRepository.findByMessageId(messageId))
@@ -91,8 +91,8 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public Mono<PageImpl<Object>> getChatMessages(String username, UUID chatId, Pageable pageable) {
-        var person = personService.getPerson(username);
-        chatService.authorizeOperation(chatId, person.getId(), MessageOperation.READ);
+        personService.getPerson(username)
+                .subscribe(personResponseDto -> chatService.authorizeOperation(chatId, personResponseDto.getId(), MessageOperation.READ));
         return messageRepository.findAllByChatIdOrderByTimestampDesc(chatId, pageable)
                 .collectList()
                 .map(
@@ -105,9 +105,9 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public Mono<PageImpl<Object>> getMessageReplies(String username, UUID messageId, Pageable pageable) {
-        var person = personService.getPerson(username);
-        messageRepository.findById(messageId)
-                        .subscribe(msg -> chatService.authorizeOperation(msg.getChatId(), person.getId(), MessageOperation.READ));
+        personService.getPerson(username)
+                .zipWith(messageRepository.findById(messageId))
+                .subscribe(tuple -> chatService.authorizeOperation(tuple.getT2().getChatId(), tuple.getT1().getId(), MessageOperation.READ));
 
         return messageRepository.findAllByReplyIdOrderByTimestampDesc(messageId, pageable)
                 .collectList()
