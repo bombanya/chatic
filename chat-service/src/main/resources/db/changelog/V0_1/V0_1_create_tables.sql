@@ -1,29 +1,30 @@
 --liquibase formatted sql
 
---changeset user:3
+--changeset user:1
 CREATE TABLE Chat
 (
     id uuid PRIMARY KEY
 );
 --rollback DROP TABLE Chat;
 
---changeset user:6
+--changeset user:2
 CREATE TABLE PersonalChat
 (
     id      uuid PRIMARY KEY REFERENCES Chat (id) ON DELETE CASCADE ON UPDATE CASCADE,
     person1 uuid NOT NULL,
-    person2 uuid NOT NULL
+    person2 uuid NOT NULL,
+    UNIQUE (person1, person2)
 );
 --rollback DROP TABLE PersonalChat;
 
---changeset user:7
+--changeset user:3
 CREATE TABLE PGroup
 (
     id uuid PRIMARY KEY REFERENCES Chat (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 --rollback DROP TABLE PGroup;
 
---changeset user:8
+--changeset user:4
 CREATE TABLE GroupRole
 (
     id             uuid PRIMARY KEY,
@@ -33,7 +34,7 @@ CREATE TABLE GroupRole
 );
 --rollback DROP TABLE GroupRole;
 
---changeset user:9
+--changeset user:5
 CREATE TABLE GroupMember
 (
     pgroup uuid REFERENCES PGroup (id),
@@ -42,8 +43,3 @@ CREATE TABLE GroupMember
     PRIMARY KEY (pgroup, person)
 );
 --rollback DROP TABLE GroupMember;
-
---changeset bombanya:12
-ALTER TABLE PersonalChat
-    ADD CONSTRAINT single_chat UNIQUE (person1, person2);
---rollback ALTER TABLE PersonalChat DROP CONSTRAINT single_chat;

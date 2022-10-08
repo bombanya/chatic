@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.UUID;
 
@@ -21,11 +22,13 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public Mono<GroupMemberDto> getGroupMemberInfo(UUID group, UUID personId) {
-                //.orElseThrow(ResourceNotFoundException::new);
-        return groupMemberRepository.findByGroupMemberId(new GroupMemberId(group, personId))
-                .map(
-                        gm -> modelMapper.map(gm, GroupMemberDto.class)
-                );
-                //.onErrorResume(ResourceNotFoundException.class, e -> n);
+        GroupMemberId groupMemberId = GroupMemberId.builder()
+                .personId(personId)
+                .pgroupId(group)
+                .build();
+        return Mono.fromCallable(() -> groupMemberRepository.findByGroupMemberId(groupMemberId)
+                        .orElseThrow(ResourceNotFoundException::new))
+                .subscribeOn(Schedulers.boundedElastic())
+                .map(groupMember -> modelMapper.map(groupMember, GroupMemberDto.class));
     }
 }

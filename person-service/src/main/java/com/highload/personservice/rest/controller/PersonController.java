@@ -11,6 +11,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,10 +30,15 @@ public class PersonController {
         personService.addPerson(personRequestDto);
     }
 
-    @GetMapping("/{username}")
-    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/byusername/{username}")
     public PersonResponseDto getPerson(@PathVariable String username) {
+        System.out.println(username);
         return personService.getPerson(username);
+    }
+
+    @GetMapping("/byid/{userId}")
+    public PersonResponseDto getPerson(@PathVariable UUID userId) {
+        return personService.getPerson(userId);
     }
 
     @DeleteMapping("/{username}")

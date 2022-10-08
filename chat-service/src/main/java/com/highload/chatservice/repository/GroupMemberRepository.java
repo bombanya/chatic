@@ -2,12 +2,12 @@ package com.highload.chatservice.repository;
 
 import com.highload.chatservice.models.GroupMember;
 import com.highload.chatservice.models.GroupMemberId;
-import org.springframework.data.repository.reactive.ReactiveCrudRepository;
-import org.springframework.stereotype.Repository;
-import reactor.core.publisher.Mono;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
 
 
-public interface GroupMemberRepository extends ReactiveCrudRepository<GroupMember, GroupMemberId> {
+public interface GroupMemberRepository extends JpaRepository<GroupMember, GroupMemberId> {
 
-    Mono<GroupMember> findByGroupMemberId(GroupMemberId groupMemberId);
+    Optional<GroupMember> findByGroupMemberId(GroupMemberId groupMemberId);
 }

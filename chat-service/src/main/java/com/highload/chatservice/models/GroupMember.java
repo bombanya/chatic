@@ -6,7 +6,7 @@ import lombok.Setter;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "groupmember", schema = "public", catalog = "chatic")
+@Table(name = "groupmember")
 @Getter
 @Setter
 public class GroupMember {
