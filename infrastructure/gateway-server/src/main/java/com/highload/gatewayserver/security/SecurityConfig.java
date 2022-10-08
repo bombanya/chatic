@@ -11,6 +11,7 @@ import com.nimbusds.jose.proc.SecurityContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.core.GrantedAuthority;
@@ -21,6 +22,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
 
 @RequiredArgsConstructor
 @EnableWebFluxSecurity
@@ -30,14 +32,25 @@ public class SecurityConfig {
     private final PersonClient personClient;
 
     @Bean
+    @Order(1)
+    public SecurityWebFilterChain loginSecurityFilterChain(ServerHttpSecurity http) {
+        return http
+                .securityMatcher(ServerWebExchangeMatchers.pathMatchers("/login"))
+                .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .authorizeExchange()
+                .anyExchange().authenticated()
+                .and()
+                .httpBasic()
+                .and()
+                .build();
+    }
+
+    @Bean
     public SecurityWebFilterChain securityFilterChain(ServerHttpSecurity http) {
         return http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange()
-                .pathMatchers("login").permitAll()
                 .anyExchange().authenticated()
-                .and()
-                .httpBasic()
                 .and()
                 .oauth2ResourceServer(ServerHttpSecurity.OAuth2ResourceServerSpec::jwt)
                 .build();
