@@ -2,13 +2,14 @@ package com.highload.messageservice.service.impls;
 
 import com.highload.messageservice.client.PersonFeignClient;
 import com.highload.messageservice.dto.reaction.ReactionRequestDto;
+import com.highload.messageservice.dto.reaction.ReactionResponseDto;
 import com.highload.messageservice.models.MessageOperation;
 import com.highload.messageservice.models.Reaction;
-import com.highload.messageservice.models.ReactionId;
 import com.highload.messageservice.repository.ReactionRepository;
 import com.highload.messageservice.service.MessageService;
 import com.highload.messageservice.service.ReactionService;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -21,33 +22,48 @@ import java.util.UUID;
 public class ReactionServiceImpl implements ReactionService {
 
     private final ReactionRepository reactionRepository;
-    private final PersonFeignClient personService;
+    private final PersonFeignClient personClient;
     private final MessageService messageService;
+    private final ModelMapper modelMapper;
 
     @Override
-    public Mono<Reaction> addReaction(String username, UUID messageId, ReactionRequestDto reactionRequestDto) {
-        var person = personService.getPerson(username).block();
-        messageService.authorizeOperationOnMessage(messageId, person.getId(), MessageOperation.READ);
-        return reactionRepository.save(new Reaction(messageId, person.getId(), reactionRequestDto.getEmoji()));
+    public Mono<?> addReaction(String username, UUID messageId, ReactionRequestDto reactionRequestDto) {
+        var person = personClient.getPerson(username);
+        return person.flatMap(personResponseDto ->
+                messageService.authorizeOperationOnMessage(messageId,
+                        personResponseDto.getId(), MessageOperation.READ))
+                .flatMap(x -> person)
+                .flatMap(personResponseDto ->
+                        reactionRepository.findByMessageIdAndPersonId(messageId, personResponseDto.getId())
+                                .switchIfEmpty(Mono.just(Reaction.builder()
+                                        .id(UUID.randomUUID())
+                                        .messageId(messageId)
+                                        .personId(personResponseDto.getId())
+                                        .build())))
+                .map(reaction -> {
+                    reaction.setEmoji(reactionRequestDto.getEmoji());
+                    return reaction;
+                })
+                .flatMap(reactionRepository::save);
     }
 
     @Override
-    public Mono<Void> deleteReaction(String username, UUID messageId) {
-        var person = personService.getPerson(username).block();
-        return reactionRepository.deleteById(new ReactionId(messageId, person.getId()));
+    public Mono<?> deleteReaction(String username, UUID messageId) {
+        return personClient.getPerson(username)
+                .flatMap(personResponseDto ->
+                        reactionRepository.findByMessageIdAndPersonId(messageId, personResponseDto.getId()));
     }
 
     @Override
-    public Mono<PageImpl<Reaction>> getReactions(String username, UUID messageId, Pageable pageable) {
-        personService.getPerson(username)
-                .subscribe(p -> messageService.authorizeOperationOnMessage(messageId, p.getId(), MessageOperation.READ));
-
-        return reactionRepository.findByReactionId_MessageId(messageId, pageable)
+    public Mono<PageImpl<ReactionResponseDto>> getReactions(String username, UUID messageId, Pageable pageable) {
+        return personClient.getPerson(username)
+                .flatMap(personResponseDto ->
+                        messageService.authorizeOperationOnMessage(messageId,
+                                personResponseDto.getId(), MessageOperation.READ))
+                .flatMapMany(x -> reactionRepository.findByMessageId(messageId, pageable))
+                .map(reaction -> modelMapper.map(reaction, ReactionResponseDto.class))
                 .collectList()
-                .zipWith(this.reactionRepository.count())
-                .map(t -> new PageImpl<>(t.getT1(), pageable, t.getT2()));
-
+                .zipWith(reactionRepository.countByMessageId(messageId))
+                .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
     }
-
-
 }

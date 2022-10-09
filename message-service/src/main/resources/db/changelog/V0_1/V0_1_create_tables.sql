@@ -1,12 +1,11 @@
 --liquibase formatted sql
 
-
 --changeset user:4
 CREATE TABLE Message
 (
     id        uuid PRIMARY KEY,
-    chat      uuid,
-    author    uuid,
+    chat      uuid NOT NULL,
+    author    uuid NOT NULL,
     timestamp timestamp NOT NULL,
     reply     uuid REFERENCES Message (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -15,10 +14,11 @@ CREATE TABLE Message
 --changeset user:5
 CREATE TABLE Reaction
 (
-    message uuid REFERENCES Message (id) ON DELETE CASCADE,
-    person  uuid,
+    id      uuid PRIMARY KEY,
+    message uuid REFERENCES Message (id) ON DELETE CASCADE ON UPDATE CASCADE,
+    person  uuid NOT NULL,
     emoji   varchar(50) NOT NULL,
-    PRIMARY KEY (message, person)
+    UNIQUE (message, person)
 );
 --rollback DROP TABLE Reaction;
 

@@ -1,17 +1,8 @@
 spring:
-  r2dbc:
-    url: r2dbc:postgresql://${DB_HOST:localhost}:${POSTGRES_DOCKER_PORT:5432}/${POSTGRES_DB:message-service}
-    username: ${POSTGRES_USER:postgres}
-    password: ${POSTGRES_PASSWORD:postgres}
-
-
   application:
     name: message-service
+  config:
+    import: configserver:http://localhost:8001
 
 server:
-  port: 8003
-
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8000/eureka/
+  port: 0

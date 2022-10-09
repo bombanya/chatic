@@ -1,58 +1,33 @@
 package com.highload.messageservice.models;
 
-import org.hibernate.annotations.GenericGenerator;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
-import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
-@Entity
-@Table(name = "messagecontent", schema = "public")
+@Table(name = "messagecontent")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class MessageContent {
 
     @Id
-    @Column(name = "id")
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid2")
+    @Column("id")
+    @NotNull
     private UUID id;
 
-    @Column(name = "message_id")
+    @Column("message_id")
     @NotNull
     private UUID messageId;
 
     @NotEmpty
     private String text;
-
-    public MessageContent(UUID messageId, String text) {
-        this.messageId = messageId;
-        this.text = text;
-    }
-
-    protected MessageContent() {
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
-    }
-
-    public UUID getMessageId() {
-        return messageId;
-    }
-
-    public void setMessageId(UUID messageId) {
-        this.messageId = messageId;
-    }
 }
