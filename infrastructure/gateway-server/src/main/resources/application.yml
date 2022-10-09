@@ -18,3 +18,7 @@ spring:
           uri: lb://person-service
           predicates:
             - Path=/persons/**
+        - id: chat_service_route
+          uri: lb://chat-service
+          predicates:
+            - Path=/personal-chats/**

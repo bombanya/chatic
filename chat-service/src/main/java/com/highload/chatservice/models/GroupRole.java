@@ -1,12 +1,16 @@
 package com.highload.chatservice.models;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.UUID;
 
 @Entity
-@Table(name = "grouprole", schema = "public", catalog = "chatic")
+@Table(name = "grouprole")
+@Getter
+@Setter
 public class GroupRole {
     @Id
     @Column(name = "id")
@@ -22,46 +26,5 @@ public class GroupRole {
 
     @Column(name = "manage_members")
     private boolean manageMembers;
-
-    public GroupRole(boolean writePosts, boolean writeComments, boolean manageMembers) {
-        this.writePosts = writePosts;
-        this.writeComments = writeComments;
-        this.manageMembers = manageMembers;
-    }
-
-    protected GroupRole() {
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public boolean isWritePosts() {
-        return writePosts;
-    }
-
-    public void setWritePosts(boolean writePosts) {
-        this.writePosts = writePosts;
-    }
-
-    public boolean isWriteComments() {
-        return writeComments;
-    }
-
-    public void setWriteComments(boolean writeComments) {
-        this.writeComments = writeComments;
-    }
-
-    public boolean isManageMembers() {
-        return manageMembers;
-    }
-
-    public void setManageMembers(boolean manageMembers) {
-        this.manageMembers = manageMembers;
-    }
 
 }

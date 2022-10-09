@@ -1,27 +1,8 @@
 spring:
-  datasource:
-    driverClassName: org.postgresql.Driver
-    url: jdbc:postgresql://${DB_HOST:localhost}:${POSTGRES_DOCKER_PORT:5432}/${POSTGRES_DB:chat-service}
-    username: ${POSTGRES_USER:postgres}
-    password: ${POSTGRES_PASSWORD:postgres}
-
-    jpa:
-      properties:
-        hibernate:
-          dialect: org.hibernate.dialect.PostgreSQL10Dialect
-          show_sql: true
-          hbm2ddl:
-            auto: validate
-      show-sql: true
-      generate-ddl: false
-
   application:
     name: chat-service
+  config:
+    import: configserver:http://localhost:8001
 
 server:
-  port: 8004
-
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8000/eureka/
+  port: 0

@@ -8,6 +8,8 @@ import com.highload.chatservice.service.GroupService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.UUID;
 
@@ -19,10 +21,14 @@ public class GroupServiceImpl implements GroupService {
     private final ModelMapper modelMapper;
 
     @Override
-    public GroupMemberDto getGroupMemberInfo(UUID group, UUID personId) {
-        var groupMemberInfo = groupMemberRepository
-                .findByGroupMemberId(new GroupMemberId(group, personId))
-                .orElseThrow(ResourceNotFoundException::new);
-        return modelMapper.map(groupMemberInfo, GroupMemberDto.class);
+    public Mono<GroupMemberDto> getGroupMemberInfo(UUID group, UUID personId) {
+        GroupMemberId groupMemberId = GroupMemberId.builder()
+                .personId(personId)
+                .pgroupId(group)
+                .build();
+        return Mono.fromCallable(() -> groupMemberRepository.findByGroupMemberId(groupMemberId)
+                        .orElseThrow(ResourceNotFoundException::new))
+                .subscribeOn(Schedulers.boundedElastic())
+                .map(groupMember -> modelMapper.map(groupMember, GroupMemberDto.class));
     }
 }
