@@ -43,13 +43,12 @@ public class ChatServiceImpl implements ChatService {
 
     private Mono<?> authorizeInPersonalChat(UUID personId, PersonalChat personalChat, MessageOperation operation) {
         Mono<PersonResponseDto> person1 = personFeignClient.getPerson(personalChat.getPerson1Id())
-                .filter(person -> !person.isDeleted())
+                .filter(person -> !person.isDeleted() || operation == MessageOperation.READ)
                 .switchIfEmpty(Mono.error(new InvalidRequestException()));
         Mono<PersonResponseDto> person2 = personFeignClient.getPerson(personalChat.getPerson2Id())
-                .filter(person -> !person.isDeleted())
+                .filter(person -> !person.isDeleted() || operation == MessageOperation.READ)
                 .switchIfEmpty(Mono.error(new InvalidRequestException()));
-        if (operation == MessageOperation.READ) return Mono.empty();
-        else return person1.zipWith(person2)
+        return person1.zipWith(person2)
                 .filter(tuple -> personalChat.getPerson1Id().equals(personId) ||
                         personalChat.getPerson2Id().equals(personId))
                 .switchIfEmpty(Mono.error(new IllegalAccessException()));
