@@ -39,6 +39,7 @@ public class ReactionServiceImpl implements ReactionService {
                                         .id(UUID.randomUUID())
                                         .messageId(messageId)
                                         .personId(personResponseDto.getId())
+                                        .isNew(true)
                                         .build())))
                 .map(reaction -> {
                     reaction.setEmoji(reactionRequestDto.getEmoji());

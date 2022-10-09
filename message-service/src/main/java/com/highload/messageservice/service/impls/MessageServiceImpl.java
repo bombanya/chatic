@@ -108,7 +108,11 @@ public class MessageServiceImpl implements MessageService {
                 .flatMap(x -> message)
                 .zipWith(messageContentRepository.findByMessageId(messageId)
                         .switchIfEmpty(Mono.error(new ResourceNotFoundException())))
-                .map(tuple -> MessageResponseDto.fromMessageWithContent(tuple.getT1(), tuple.getT2()));
+                .map(tuple -> {
+                    System.out.println(tuple.getT1().getId());
+                    System.out.println(tuple.getT2().getText());
+                    return MessageResponseDto.fromMessageWithContent(tuple.getT1(), tuple.getT2());
+                });
 
     }
 

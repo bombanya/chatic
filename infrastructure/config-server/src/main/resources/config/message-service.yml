@@ -3,6 +3,10 @@ spring:
     url: r2dbc:postgresql://${DB_HOST:localhost}:${POSTGRES_DOCKER_PORT:5432}/${POSTGRES_DB:message-service}
     username: ${POSTGRES_USER:postgres}
     password: ${POSTGRES_PASSWORD:postgres}
+  liquibase:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${POSTGRES_DOCKER_PORT:5432}/${POSTGRES_DB:message-service}
+    user: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:postgres}
 
 eureka:
   client:

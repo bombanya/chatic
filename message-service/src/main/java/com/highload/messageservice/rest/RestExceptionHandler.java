@@ -1,5 +1,5 @@
 package com.highload.messageservice.rest;
-
+/*
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.highload.messageservice.exception.IllegalAccessException;
@@ -103,5 +103,5 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                             FieldError::getDefaultMessage)));
         }
     }
-}
+}*/
 

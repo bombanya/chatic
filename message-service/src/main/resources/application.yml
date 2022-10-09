@@ -3,6 +3,11 @@ spring:
     name: message-service
   config:
     import: configserver:http://localhost:8001
+  liquibase:
+    url:
+    user:
+    password:
 
 server:
   port: 0
+

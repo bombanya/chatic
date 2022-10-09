@@ -8,6 +8,6 @@ import reactor.core.publisher.Mono;
 
 @ReactiveFeignClient("person-service")
 public interface PersonFeignClient {
-    @GetMapping(path = "/persons/{username}")
+    @GetMapping( "/persons/byusername/{username}")
     Mono<PersonResponseDto> getPerson(@PathVariable(value = "username") String username);
 }

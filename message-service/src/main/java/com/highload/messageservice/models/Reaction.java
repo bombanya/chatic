@@ -2,6 +2,7 @@ package com.highload.messageservice.models;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -13,7 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Reaction {
+public class Reaction implements Persistable<UUID> {
 
     @Id
     @NotNull
@@ -30,4 +31,11 @@ public class Reaction {
     @Column("emoji")
     @NotNull(message = "Должна быть задана реакция")
     private Emoji emoji;
+
+    private boolean isNew = false;
+
+    @Override
+    public boolean isNew() {
+        return isNew;
+    }
 }

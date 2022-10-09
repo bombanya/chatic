@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -17,7 +18,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class MessageContent {
+public class MessageContent implements Persistable<UUID> {
 
     @Id
     @Column("id")
@@ -30,4 +31,9 @@ public class MessageContent {
 
     @NotEmpty
     private String text;
+
+    @Override
+    public boolean isNew() {
+        return true;
+    }
 }
