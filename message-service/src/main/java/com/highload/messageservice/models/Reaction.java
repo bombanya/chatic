@@ -1,30 +1,41 @@
 package com.highload.messageservice.models;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.domain.Persistable;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
-import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
-@Entity
-@Table(name = "reaction", schema = "public", catalog = "chatic")
-@Getter
-@Setter
-public class Reaction {
-    @EmbeddedId
-    private ReactionId reactionId;
+@Table(name = "reaction")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Reaction implements Persistable<UUID> {
 
-    @Column(name = "emoji")
-    @Enumerated(EnumType.STRING)
+    @Id
+    @NotNull
+    private UUID id;
+
+    @Column("message")
+    @NotNull
+    private UUID messageId;
+
+    @Column("person")
+    @NotNull
+    private UUID personId;
+
+    @Column("emoji")
     @NotNull(message = "Должна быть задана реакция")
     private Emoji emoji;
 
-    public Reaction(UUID messageId, UUID personId, Emoji emoji) {
-        this.reactionId = new ReactionId(messageId, personId);
-        this.emoji = emoji;
-    }
+    private boolean isNew = false;
 
-    protected Reaction() {
+    @Override
+    public boolean isNew() {
+        return isNew;
     }
 }

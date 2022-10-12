@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 import java.util.Optional;
@@ -26,6 +27,7 @@ public class PersonRepository {
     @Qualifier("personMapper")
     private RowMapper<Person> personRowMapper;
 
+    @Transactional
     public Optional<Person> findById(UUID id) {
         return jdbcTemplate.queryForStream(sqlHolder.findById(),
                 Map.of("id", id),
@@ -33,6 +35,7 @@ public class PersonRepository {
                 .findFirst();
     }
 
+    @Transactional
     public Optional<Person> findByUsername(String username) {
         return jdbcTemplate.queryForStream(sqlHolder.findByUsername(),
                 Map.of("username", username),
@@ -40,6 +43,7 @@ public class PersonRepository {
                 .findFirst();
     }
 
+    @Transactional
     public Optional<Person> findByUsernameForAuth(String username) {
         return jdbcTemplate.queryForStream(sqlHolder.findByUsernameAuth(),
                 Map.of("username", username),
@@ -47,12 +51,14 @@ public class PersonRepository {
                 .findFirst();
     }
 
+    @Transactional
     public void save(Person person) {
         person.setId(UUID.randomUUID());
         jdbcInsert.withTableName("person")
                 .execute(new BeanPropertySqlParameterSource(person));
     }
 
+    @Transactional
     public void delete(Person person) {
         jdbcTemplate.update(sqlHolder.deleteById(), Map.of("id", person.getId()));
     }

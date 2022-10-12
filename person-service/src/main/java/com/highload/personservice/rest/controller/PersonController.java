@@ -32,7 +32,6 @@ public class PersonController {
 
     @GetMapping("/byusername/{username}")
     public PersonResponseDto getPerson(@PathVariable String username) {
-        System.out.println(username);
         return personService.getPerson(username);
     }
 

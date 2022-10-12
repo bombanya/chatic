@@ -1,12 +1,13 @@
 package com.highload.messageservice.client;
 
 import com.highload.messageservice.client.shared.PersonResponseDto;
-import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import reactivefeign.spring.config.ReactiveFeignClient;
+import reactor.core.publisher.Mono;
 
-@FeignClient("person-service")
+@ReactiveFeignClient("person-service")
 public interface PersonFeignClient {
-    @GetMapping(path = "/persons/{username}")
-    PersonResponseDto getPerson(@PathVariable(value = "username") String username);
+    @GetMapping( "/persons/byusername/{username}")
+    Mono<PersonResponseDto> getPerson(@PathVariable(value = "username") String username);
 }
