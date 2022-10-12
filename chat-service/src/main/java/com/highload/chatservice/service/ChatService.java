@@ -1,13 +1,14 @@
 package com.highload.chatservice.service;
 
-import com.highload.chatservice.models.MessageOperation;
+import com.highload.chatservice.models.ChatOperation;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
 public interface ChatService {
 
-    Mono<?> authorizeOperation(UUID chatId, UUID personId, MessageOperation operation);
+    Mono<Void> authorizeOperation(UUID chatId, UUID personId, ChatOperation operation);
 
+    Mono<Void> authorizeOperation(UUID chatId, String username, ChatOperation operation);
 
 }

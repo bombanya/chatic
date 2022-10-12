@@ -1,14 +1,15 @@
 package com.highload.chatservice.models;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "groupmember")
-@Getter
-@Setter
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class GroupMember {
     @EmbeddedId
     private GroupMemberId groupMemberId;
