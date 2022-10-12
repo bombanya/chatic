@@ -28,48 +28,40 @@ public class PersonalChatServiceImpl implements PersonalChatService {
         var person2 = personClient.getPerson(username2);
         return person1.zipWith(person2)
                 .flatMap(tuple -> Mono.fromCallable(() ->
-                        personalChatRepository.findByPerson1IdAndPerson2Id(
-                                tuple.getT1().getId(),
-                                tuple.getT2().getId())
-                                .orElseThrow(ResourceNotFoundException::new))
-                        .subscribeOn(Schedulers.boundedElastic()))
-                .map(personalChat -> modelMapper.map(personalChat, PersonalChatResponseDto.class));
+                                personalChatRepository.findByPerson1IdAndPerson2Id(
+                                        tuple.getT1().getId(),
+                                        tuple.getT2().getId()
+                                ).orElseThrow(ResourceNotFoundException::new)
+                        ).subscribeOn(Schedulers.boundedElastic())
+                ).map(personalChat -> modelMapper.map(personalChat, PersonalChatResponseDto.class));
     }
 
     @Override
     public Mono<PersonalChatResponseDto> addChat(String username1, String username2) {
-        var person1 = personClient.getPerson(username1)
-                .map(personResponseDto -> {
-                    System.out.println(personResponseDto.getUsername());
-                    return personResponseDto;
-                });
-        var person2 = personClient.getPerson(username2)
-                .map(personResponseDto -> {
-                    System.out.println(personResponseDto.getUsername());
-                    return personResponseDto;
-                });
+        var person1 = personClient.getPerson(username1);
+        var person2 = personClient.getPerson(username2);
         return person1.zipWith(person2)
                 .flatMap(tuple -> Mono.fromCallable(() ->
-                        personalChatRepository.findByPerson1IdAndPerson2Id(
-                                tuple.getT1().getId(),
-                                tuple.getT2().getId()
-                        )
-                                .orElseGet(() ->
+                                personalChatRepository.findByPerson1IdAndPerson2Id(
+                                        tuple.getT1().getId(),
+                                        tuple.getT2().getId()
+                                ).orElseGet(() ->
                                         personalChatRepository.save(PersonalChat.builder()
                                                 .person1Id(tuple.getT1().getId())
                                                 .person2Id(tuple.getT2().getId())
-                                                .build())))
-                        .subscribeOn(Schedulers.boundedElastic()))
-                .map(personalChat -> modelMapper.map(personalChat, PersonalChatResponseDto.class));
+                                                .build())
+                                )
+                        ).subscribeOn(Schedulers.boundedElastic())
+                ).map(personalChat -> modelMapper.map(personalChat, PersonalChatResponseDto.class));
     }
 
     @Override
     public Mono<PageResponseDto<PersonalChat>> getAllChats(String username, Pageable pageable) {
         var user = personClient.getPerson(username);
         return user.flatMap(personResponseDto ->
-                        Mono.fromCallable(() -> personalChatRepository
-                                        .findAllUserChats(personResponseDto.getId(), pageable))
-                                .subscribeOn(Schedulers.boundedElastic()))
-                .map(PageResponseDto::new);
+                Mono.fromCallable(() ->
+                        personalChatRepository.findAllUserChats(personResponseDto.getId(), pageable)
+                ).subscribeOn(Schedulers.boundedElastic())
+        ).map(PageResponseDto::new);
     }
 }

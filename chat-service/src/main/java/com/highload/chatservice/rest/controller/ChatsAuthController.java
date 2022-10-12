@@ -1,6 +1,6 @@
 package com.highload.chatservice.rest.controller;
 
-import com.highload.chatservice.models.MessageOperation;
+import com.highload.chatservice.models.ChatOperation;
 import com.highload.chatservice.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,9 +19,9 @@ public class ChatsAuthController {
     private final ChatService chatService;
 
     @PostMapping("/{chatId}/{personId}/{operation}")
-    public Mono<?> authorizeOperation(@PathVariable UUID chatId,
-                                      @PathVariable UUID personId,
-                                      @PathVariable MessageOperation operation) {
+    public Mono<Void> authorizeOperation(@PathVariable UUID chatId,
+                                         @PathVariable UUID personId,
+                                         @PathVariable ChatOperation operation) {
         return chatService.authorizeOperation(chatId, personId, operation);
     }
 }

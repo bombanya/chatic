@@ -1,7 +1,6 @@
 package com.highload.chatservice.models;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -10,8 +9,10 @@ import java.util.UUID;
 @Entity
 @Table(name = "chat")
 @Inheritance(strategy = InheritanceType.JOINED)
-@Getter
-@Setter
+@NoArgsConstructor
+@Builder
+@Data
+@AllArgsConstructor
 public class Chat {
     @Id
     @Column(name = "id")

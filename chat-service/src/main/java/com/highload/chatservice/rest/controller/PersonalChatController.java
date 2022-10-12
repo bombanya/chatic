@@ -18,30 +18,22 @@ public class PersonalChatController {
     private final PersonalChatService service;
 
     @GetMapping
-    public Mono<PersonalChatResponseDto> getPersonalChat(
-            @RequestParam(name = "username") String username1,
-            @RequestHeader("USERNAME") String username2
-    ) {
-        System.out.println(username1);
+    public Mono<PersonalChatResponseDto> getPersonalChat(@RequestParam(name = "username") String username1,
+                                                         @RequestHeader("USERNAME") String username2) {
         return service.getChat(username1, username2);
     }
 
-    //кажется, логичнее вынести в общий контроллер для чатов
-    @GetMapping(params = {"page", "size"})
-    public Mono<PageResponseDto<PersonalChat>> getPersonalChats(
-            @RequestParam int page,
-            @RequestParam int size,
-            @RequestHeader("USERNAME") String username
-    ) {
+    @GetMapping
+    public Mono<PageResponseDto<PersonalChat>> getPersonalChats(@RequestParam int page,
+                                                                @RequestParam int size,
+                                                                @RequestHeader("USERNAME") String username) {
         return service.getAllChats(username, PageRequest.of(page, size));
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<PersonalChatResponseDto> addPersonalChat(
-            @RequestParam(name = "username") String username1,
-            @RequestHeader("USERNAME") String username2
-    ) {
+    public Mono<PersonalChatResponseDto> addPersonalChat(@RequestParam(name = "username") String username1,
+                                                         @RequestHeader("USERNAME") String username2) {
         return service.addChat(username1, username2);
     }
 
