@@ -3,7 +3,7 @@ package com.highload.messageservice.service.impls;
 import com.highload.messageservice.client.PersonFeignClient;
 import com.highload.messageservice.dto.reaction.ReactionRequestDto;
 import com.highload.messageservice.dto.reaction.ReactionResponseDto;
-import com.highload.messageservice.models.MessageOperation;
+import com.highload.messageservice.models.ChatOperation;
 import com.highload.messageservice.models.Reaction;
 import com.highload.messageservice.repository.ReactionRepository;
 import com.highload.messageservice.service.MessageService;
@@ -27,32 +27,37 @@ public class ReactionServiceImpl implements ReactionService {
     private final ModelMapper modelMapper;
 
     @Override
-    public Mono<?> addReaction(String username, UUID messageId, ReactionRequestDto reactionRequestDto) {
+    public Mono<ReactionResponseDto> addReaction(String username, UUID messageId, ReactionRequestDto reactionRequestDto) {
         var person = personClient.getPerson(username);
         return person.flatMap(personResponseDto ->
-                messageService.authorizeOperationOnMessage(messageId,
-                        personResponseDto.getId(), MessageOperation.READ))
-                .flatMap(x -> person)
+                        messageService.authorizeOperationOnMessage(
+                                        messageId,
+                                        personResponseDto.getId(), ChatOperation.READ)
+                                .thenReturn(personResponseDto))
                 .flatMap(personResponseDto ->
                         reactionRepository.findByMessageIdAndPersonId(messageId, personResponseDto.getId())
-                                .switchIfEmpty(Mono.just(Reaction.builder()
-                                        .id(UUID.randomUUID())
-                                        .messageId(messageId)
-                                        .personId(personResponseDto.getId())
-                                        .isNew(true)
-                                        .build())))
+                                .switchIfEmpty(
+                                        Mono.just(Reaction.builder()
+                                                .id(UUID.randomUUID())
+                                                .messageId(messageId)
+                                                .personId(personResponseDto.getId())
+                                                .isNew(true)
+                                                .build())
+                                ))
                 .map(reaction -> {
                     reaction.setEmoji(reactionRequestDto.getEmoji());
                     return reaction;
                 })
-                .flatMap(reactionRepository::save);
+                .flatMap(reactionRepository::save)
+                .map(reaction -> modelMapper.map(reaction, ReactionResponseDto.class));
     }
 
     @Override
-    public Mono<?> deleteReaction(String username, UUID messageId) {
+    public Mono<Void> deleteReaction(String username, UUID messageId) {
         return personClient.getPerson(username)
                 .flatMap(personResponseDto ->
-                        reactionRepository.findByMessageIdAndPersonId(messageId, personResponseDto.getId()));
+                        reactionRepository.findByMessageIdAndPersonId(messageId, personResponseDto.getId()))
+                .flatMap(reactionRepository::delete);
     }
 
     @Override
@@ -60,8 +65,8 @@ public class ReactionServiceImpl implements ReactionService {
         return personClient.getPerson(username)
                 .flatMap(personResponseDto ->
                         messageService.authorizeOperationOnMessage(messageId,
-                                personResponseDto.getId(), MessageOperation.READ))
-                .flatMapMany(x -> reactionRepository.findByMessageId(messageId, pageable))
+                                personResponseDto.getId(), ChatOperation.READ))
+                .thenMany(reactionRepository.findByMessageId(messageId, pageable))
                 .map(reaction -> modelMapper.map(reaction, ReactionResponseDto.class))
                 .collectList()
                 .zipWith(reactionRepository.countByMessageId(messageId))

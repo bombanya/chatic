@@ -6,9 +6,9 @@ import com.highload.messageservice.dto.message.MessageRequestDto;
 import com.highload.messageservice.dto.message.MessageResponseDto;
 import com.highload.messageservice.exception.IllegalAccessException;
 import com.highload.messageservice.exception.ResourceNotFoundException;
+import com.highload.messageservice.models.ChatOperation;
 import com.highload.messageservice.models.Message;
 import com.highload.messageservice.models.MessageContent;
-import com.highload.messageservice.models.MessageOperation;
 import com.highload.messageservice.repository.MessageContentRepository;
 import com.highload.messageservice.repository.MessageRepository;
 import com.highload.messageservice.service.MessageService;
@@ -32,31 +32,34 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     @Transactional
-    public Mono<?> updateMessage(String username, UUID messageID, MessageRequestDto messageRequestDto) {
+    public Mono<Void> updateMessage(String username, UUID messageID, MessageRequestDto messageRequestDto) {
         var person = personClient.getPerson(username);
         return person.flatMap(personResponseDto ->
-                        checkPersonIsAuthor(personResponseDto.getId(), messageID))
-                .flatMap(x -> person)
+                        checkPersonIsAuthor(personResponseDto.getId(), messageID)
+                                .thenReturn(personResponseDto))
                 .flatMap(personResponseDto ->
-                        messageContentRepository.updateMessageContent(messageID,
-                                messageRequestDto.textContent()));
+                        messageContentRepository.updateMessageContent(
+                                messageID,
+                                messageRequestDto.textContent()
+                        ));
     }
 
     @Override
-    public Mono<?> deleteMessage(String username, UUID messageId) {
+    public Mono<Void> deleteMessage(String username, UUID messageId) {
         return personClient.getPerson(username)
                 .flatMap(personResponseDto -> checkPersonIsAuthor(personResponseDto.getId(), messageId))
-                .flatMap(x -> messageRepository.deleteById(messageId));
+                .then(messageRepository.deleteById(messageId));
     }
 
     @Override
     @Transactional
-    public Mono<?> addMessage(String username, MessageRequestDto messageRequestDto) {
+    public Mono<MessageResponseDto> addMessage(String username, MessageRequestDto messageRequestDto) {
         var person = personClient.getPerson(username);
-        return person.flatMap(personResponseDto -> chatClient
-                .authorizeOperation(messageRequestDto.chatId(),
-                        personResponseDto.getId(), MessageOperation.WRITE))
-                .flatMap(x -> person)
+        return person.flatMap(personResponseDto ->
+                        chatClient.authorizeOperation(
+                                        messageRequestDto.chatId(),
+                                        personResponseDto.getId(), ChatOperation.WRITE)
+                                .thenReturn(personResponseDto))
                 .map(personResponseDto -> Message.builder()
                         .id(UUID.randomUUID())
                         .chatId(messageRequestDto.chatId())
@@ -69,19 +72,22 @@ public class MessageServiceImpl implements MessageService {
                         .messageId(message.getId())
                         .text(messageRequestDto.textContent())
                         .build())
-                .flatMap(messageContentRepository::save);
+                .flatMap(messageContentRepository::save)
+                .flatMap(messageContent -> getMessage(username, messageContent.getMessageId()));
     }
 
     @Override
     @Transactional
-    public Mono<?> addReply(String username, UUID replyId, MessageRequestDto messageRequestDto) {
+    public Mono<MessageResponseDto> addReply(String username, UUID replyId, MessageRequestDto messageRequestDto) {
         var person = personClient.getPerson(username);
         return person.flatMap(personResponseDto ->
-                chatClient.authorizeOperation(messageRequestDto.chatId(),
-                        personResponseDto.getId(), MessageOperation.REPLY))
-                .flatMap(x -> person)
-                .zipWith(messageRepository.findById(replyId)
-                        .switchIfEmpty(Mono.error(new ResourceNotFoundException())))
+                        chatClient.authorizeOperation(
+                                messageRequestDto.chatId(),
+                                personResponseDto.getId(), ChatOperation.REPLY
+                        ).thenReturn(personResponseDto))
+                .zipWith(
+                        messageRepository.findById(replyId)
+                                .switchIfEmpty(Mono.error(new ResourceNotFoundException())))
                 .map(tuple -> Message.builder()
                         .id(UUID.randomUUID())
                         .chatId(messageRequestDto.chatId())
@@ -94,7 +100,8 @@ public class MessageServiceImpl implements MessageService {
                         .messageId(message.getId())
                         .text(messageRequestDto.textContent())
                         .build())
-                .flatMap(messageContentRepository::save);
+                .flatMap(messageContentRepository::save)
+                .flatMap(messageContent -> getMessage(username, messageContent.getMessageId()));
     }
 
     @Override
@@ -103,33 +110,31 @@ public class MessageServiceImpl implements MessageService {
         var message = messageRepository.findById(messageId)
                 .switchIfEmpty(Mono.error(new ResourceNotFoundException()));
         return person.zipWith(message)
-                .flatMap(tuple -> chatClient.authorizeOperation(tuple.getT2().getChatId(),
-                        tuple.getT1().getId(), MessageOperation.READ))
+                .flatMap(tuple ->
+                        chatClient.authorizeOperation(
+                                tuple.getT2().getChatId(),
+                                tuple.getT1().getId(), ChatOperation.READ))
                 .flatMap(x -> message)
                 .zipWith(messageContentRepository.findByMessageId(messageId)
                         .switchIfEmpty(Mono.error(new ResourceNotFoundException())))
-                .map(tuple -> {
-                    System.out.println(tuple.getT1().getId());
-                    System.out.println(tuple.getT2().getText());
-                    return MessageResponseDto.fromMessageWithContent(tuple.getT1(), tuple.getT2());
-                });
+                .map(tuple -> MessageResponseDto.fromMessageWithContent(tuple.getT1(), tuple.getT2()));
 
     }
 
     @Override
     public Mono<PageImpl<MessageResponseDto>> getChatMessages(String username, UUID chatId, Pageable pageable) {
-        var messages = personClient.getPerson(username)
-                .flatMap(personResponseDto ->
-                        chatClient.authorizeOperation(chatId, personResponseDto.getId(), MessageOperation.READ))
-                .flatMapMany(x -> messageRepository.findAllByChatIdOrderByTimestampDesc(chatId, pageable))
-                .collectList();
-        var content = messages.flatMapMany(messageList ->
-                messageContentRepository.findByMessageIdIn(messageList
-                        .stream()
-                        .map(Message::getId)
-                        .toList()))
-                .collectList();
-        return messages.zipWith(content)
+        var messages =
+                personClient.getPerson(username)
+                        .flatMap(personResponseDto ->
+                                chatClient.authorizeOperation(chatId, personResponseDto.getId(), ChatOperation.READ))
+                        .thenMany(messageRepository.findAllByChatIdOrderByTimestampDesc(chatId, pageable));
+        var content =
+                messages.mapNotNull(Message::getId)
+                        .collectList()
+                        .flatMapMany(messageContentRepository::findByMessageIdIn)
+                        .collectList();
+        return messages.collectList()
+                .zipWith(content)
                 .map(tuple -> MessageResponseDto.fromMessagesWithContent(tuple.getT1(), tuple.getT2()))
                 .zipWith(messageRepository.countByChatId(chatId)
                         .switchIfEmpty(Mono.error(new ResourceNotFoundException())))
@@ -143,17 +148,16 @@ public class MessageServiceImpl implements MessageService {
         var replies = person.zipWith(message)
                 .flatMap(tuple ->
                         chatClient.authorizeOperation(tuple.getT2().getChatId(),
-                                tuple.getT1().getId(), MessageOperation.READ))
-                .flatMap(x -> message)
-                .flatMapMany(m -> messageRepository.findAllByReplyIdOrderByTimestampDesc(m.getId(), pageable))
-                .collectList();
-        var content = replies.flatMapMany(messageList ->
-                        messageContentRepository.findByMessageIdIn(messageList
-                                .stream()
-                                .map(Message::getId)
-                                .toList()))
-                .collectList();
-        return replies.zipWith(content)
+                                tuple.getT1().getId(), ChatOperation.READ))
+                .then(message)
+                .flatMapMany(m -> messageRepository.findAllByReplyIdOrderByTimestampDesc(m.getId(), pageable));
+        var content =
+                replies.mapNotNull(Message::getId)
+                        .collectList()
+                        .flatMapMany(messageContentRepository::findByMessageIdIn)
+                        .collectList();
+        return replies.collectList()
+                .zipWith(content)
                 .map(tuple -> MessageResponseDto.fromMessagesWithContent(tuple.getT1(), tuple.getT2()))
                 .zipWith(messageRepository.countByReplyId(messageId)
                         .switchIfEmpty(Mono.error(new ResourceNotFoundException())))
@@ -161,19 +165,21 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public Mono<?> authorizeOperationOnMessage(UUID messageId, UUID personId, MessageOperation operation) {
+    public Mono<Void> authorizeOperationOnMessage(UUID messageId, UUID personId, ChatOperation operation) {
         return messageRepository.findById(messageId)
                 .switchIfEmpty(Mono.error(new ResourceNotFoundException()))
                 .map(m -> {
-                    if (operation == MessageOperation.WRITE) throw new IllegalAccessException();
+                    if (operation == ChatOperation.WRITE) throw new IllegalAccessException();
                     else return chatClient.authorizeOperation(m.getChatId(), personId, operation);
-                });
+                })
+                .then();
     }
 
-    private Mono<?> checkPersonIsAuthor(UUID personId, UUID messageId) {
+    private Mono<Void> checkPersonIsAuthor(UUID personId, UUID messageId) {
         return messageRepository.findById(messageId)
                 .switchIfEmpty(Mono.error(new ResourceNotFoundException()))
                 .filter(message -> !message.getAuthorId().equals(personId))
-                .switchIfEmpty(Mono.error(new IllegalAccessException()));
+                .switchIfEmpty(Mono.error(new IllegalAccessException()))
+                .then();
     }
 }

@@ -9,9 +9,9 @@ import reactor.core.publisher.Mono;
 import java.util.UUID;
 
 public interface ReactionService {
-    Mono<?> addReaction(String username, UUID messageId, ReactionRequestDto reactionRequestDto);
+    Mono<ReactionResponseDto> addReaction(String username, UUID messageId, ReactionRequestDto reactionRequestDto);
 
-    Mono<?> deleteReaction(String username, UUID messageId);
+    Mono<Void> deleteReaction(String username, UUID messageId);
 
     Mono<PageImpl<ReactionResponseDto>> getReactions(String username, UUID messageId, Pageable pageable);
 }

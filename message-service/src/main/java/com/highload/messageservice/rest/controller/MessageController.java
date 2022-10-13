@@ -22,28 +22,28 @@ public class MessageController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<?> addMessage(@RequestBody @Valid MessageRequestDto messageRequestDto,
+    public Mono<MessageResponseDto> addMessage(@RequestBody @Valid MessageRequestDto messageRequestDto,
                               @RequestHeader("USERNAME") String username) {
         return service.addMessage(username, messageRequestDto);
     }
 
     @PostMapping("/{messageId}/replies")
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<?> addReply(@PathVariable UUID messageId,
+    public Mono<MessageResponseDto> addReply(@PathVariable UUID messageId,
                             @RequestBody @Valid MessageRequestDto messageRequestDto,
                             @RequestHeader("USERNAME") String username) {
         return service.addReply(username, messageId, messageRequestDto);
     }
 
     @PutMapping("/{messageId}")
-    public Mono<?> updateMessage(@PathVariable UUID messageId,
+    public Mono<Void> updateMessage(@PathVariable UUID messageId,
                                  @RequestBody @Valid MessageRequestDto messageRequestDto,
                                  @RequestHeader("USERNAME") String username) {
         return service.updateMessage(username, messageId, messageRequestDto);
     }
 
     @DeleteMapping("/{messageId}")
-    public Mono<?> deleteMessage(@PathVariable UUID messageId,
+    public Mono<Void> deleteMessage(@PathVariable UUID messageId,
                                  @RequestHeader("USERNAME") String username) {
         return service.deleteMessage(username, messageId);
     }

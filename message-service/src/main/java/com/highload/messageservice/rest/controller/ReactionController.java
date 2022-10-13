@@ -30,14 +30,14 @@ public class ReactionController {
 
     @PutMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<?> addReaction(@PathVariable UUID messageId,
+    public Mono<ReactionResponseDto> addReaction(@PathVariable UUID messageId,
                                @RequestBody @Valid ReactionRequestDto reactionRequestDto,
                                @RequestHeader("USERNAME") String username) {
         return service.addReaction(username, messageId, reactionRequestDto);
     }
 
     @DeleteMapping
-    public Mono<?> deleteReaction(@PathVariable UUID messageId,
+    public Mono<Void> deleteReaction(@PathVariable UUID messageId,
                                   @RequestHeader("USERNAME") String username) {
         return service.deleteReaction(username, messageId);
     }

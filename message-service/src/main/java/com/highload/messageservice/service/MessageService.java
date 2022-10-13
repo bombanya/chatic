@@ -2,7 +2,7 @@ package com.highload.messageservice.service;
 
 import com.highload.messageservice.dto.message.MessageRequestDto;
 import com.highload.messageservice.dto.message.MessageResponseDto;
-import com.highload.messageservice.models.MessageOperation;
+import com.highload.messageservice.models.ChatOperation;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import reactor.core.publisher.Mono;
@@ -11,13 +11,13 @@ import java.util.UUID;
 
 public interface MessageService {
 
-    Mono<?> updateMessage(String username, UUID messageId, MessageRequestDto messageRequestDto);
+    Mono<Void> updateMessage(String username, UUID messageId, MessageRequestDto messageRequestDto);
 
-    Mono<?> deleteMessage(String username, UUID messageId);
+    Mono<Void> deleteMessage(String username, UUID messageId);
 
-    Mono<?> addMessage(String username, MessageRequestDto messageRequestDto);
+    Mono<MessageResponseDto> addMessage(String username, MessageRequestDto messageRequestDto);
 
-    Mono<?> addReply(String username, UUID replyId, MessageRequestDto messageRequestDto);
+    Mono<MessageResponseDto> addReply(String username, UUID replyId, MessageRequestDto messageRequestDto);
 
     Mono<MessageResponseDto> getMessage(String username, UUID messageId);
 
@@ -25,5 +25,5 @@ public interface MessageService {
 
     Mono<PageImpl<MessageResponseDto>> getMessageReplies(String username, UUID messageId, Pageable pageable);
 
-    Mono<?> authorizeOperationOnMessage(UUID messageId, UUID personId, MessageOperation operation);
+    Mono<Void> authorizeOperationOnMessage(UUID messageId, UUID personId, ChatOperation operation);
 }
