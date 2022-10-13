@@ -8,7 +8,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
-@ReactiveFeignClient(name = "chat-service")
+@ReactiveFeignClient(name = "chat-service", fallback = FallbackChat.class)
 public interface ChatFeignClient {
     @PostMapping("/auth/{chatId}/{personId}/{operation}")
     Mono<Void> authorizeOperation(@PathVariable UUID chatId,

@@ -8,7 +8,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
-@ReactiveFeignClient(name = "person-service")
+@ReactiveFeignClient(name = "person-service", fallback = Fallback.class)
 public interface PersonFeignClient {
     @GetMapping("/persons/byusername/{username}")
     Mono<PersonResponseDto> getPerson(@PathVariable String username);
