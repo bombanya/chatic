@@ -2,7 +2,6 @@ package com.highload.chatservice.service.impls;
 
 import com.highload.chatservice.client.PersonFeignClient;
 import com.highload.chatservice.client.shared.PersonResponseDto;
-import com.highload.chatservice.dto.group.GroupMemberResponseDto;
 import com.highload.chatservice.exception.IllegalAccessException;
 import com.highload.chatservice.exception.InvalidRequestException;
 import com.highload.chatservice.exception.ResourceNotFoundException;
@@ -32,14 +31,13 @@ public class ChatServiceImpl implements ChatService {
     public Mono<Void> authorizeOperation(UUID chatId, UUID personId, ChatOperation operation) {
         return Mono.fromCallable(() ->
                         chatRepository.findById(chatId)
-                                .orElseThrow(ResourceNotFoundException::new)
-                )
+                                .orElseThrow(ResourceNotFoundException::new))
                 .subscribeOn(Schedulers.boundedElastic())
                 .flatMap(chat -> {
                     if (chat instanceof PersonalChat personalChat)
                         return authorizeInPersonalChat(personId, personalChat, operation);
                     else if (chat instanceof PGroup)
-                        return authorizeInGroup(groupService.getGroupMemberInfo(chatId, personId), operation);
+                        return groupService.authorizeOperation(chatId, personId, operation);
                     else return Mono.error(new IllegalAccessException());
                 });
     }
@@ -59,19 +57,6 @@ public class ChatServiceImpl implements ChatService {
                 .filter(person -> !person.isDeleted() || operation == ChatOperation.READ)
                 .switchIfEmpty(Mono.error(InvalidRequestException::new))
                 .filter(person -> personId.equals(person.getId()))
-                .switchIfEmpty(Mono.error(IllegalAccessException::new))
-                .then();
-    }
-
-    private Mono<Void> authorizeInGroup(Mono<GroupMemberResponseDto> groupMemberDto, ChatOperation operation) {
-        return groupMemberDto.filter(groupMember ->
-                        switch (operation) {
-                            case WRITE -> groupMember.isWritePosts();
-                            case REPLY -> groupMember.isWriteComments();
-                            case MANAGE -> groupMember.isManageMembers();
-                            case READ -> true;
-                        }
-                )
                 .switchIfEmpty(Mono.error(IllegalAccessException::new))
                 .then();
     }

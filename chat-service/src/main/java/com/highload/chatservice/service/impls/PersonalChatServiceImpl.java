@@ -45,12 +45,12 @@ public class PersonalChatServiceImpl implements PersonalChatService {
                                 personalChatRepository.findByPerson1IdAndPerson2Id(
                                         tuple.getT1().getId(),
                                         tuple.getT2().getId()
-                                ).orElseGet(() ->
-                                        personalChatRepository.save(PersonalChat.builder()
-                                                .person1Id(tuple.getT1().getId())
-                                                .person2Id(tuple.getT2().getId())
-                                                .build())
-                                )
+                                ).orElseGet(() -> {
+                                    var personalChat = new PersonalChat();
+                                    personalChat.setPerson1Id(tuple.getT1().getId());
+                                    personalChat.setPerson2Id(tuple.getT2().getId());
+                                    return personalChatRepository.save(personalChat);
+                                })
                         ).subscribeOn(Schedulers.boundedElastic())
                 ).map(personalChat -> modelMapper.map(personalChat, PersonalChatResponseDto.class));
     }

@@ -33,6 +33,14 @@ public class GroupController {
         return service.addGroup(username, groupRequestDto);
     }
 
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    public Mono<PageResponseDto<GroupResponseDto>> getAllGroups(@RequestHeader("USERNAME") String username,
+                                               @RequestParam(defaultValue = "0") int page,
+                                               @RequestParam(defaultValue = "10") int size) {
+        return service.getAllGroups(username, PageRequest.of(page, size));
+    }
+
     @GetMapping("/{groupId}/members")
     @ResponseStatus(HttpStatus.OK)
     public Mono<PageResponseDto<GroupMemberResponseDto>> getMembers(@RequestParam(defaultValue = "0") int page,
@@ -60,10 +68,10 @@ public class GroupController {
 
     @PutMapping("/{groupId}/members")
     @ResponseStatus(HttpStatus.OK)
-    public Mono<GroupMemberResponseDto> updateMember(@RequestBody @Valid GroupMemberRequestDto groupMemberRequestDto,
-                                                     @PathVariable UUID groupId,
-                                                     @RequestHeader("USERNAME") String username) {
-        return service.addMember(username, groupId, groupMemberRequestDto);
+    public Mono<Void> updateMember(@RequestBody @Valid GroupMemberRequestDto groupMemberRequestDto,
+                                   @PathVariable UUID groupId,
+                                   @RequestHeader("USERNAME") String username) {
+        return service.updateMember(username, groupId, groupMemberRequestDto);
     }
 
     @DeleteMapping("/{groupId}/members/{personId}")

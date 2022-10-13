@@ -17,8 +17,8 @@ public class PersonalChatController {
 
     private final PersonalChatService service;
 
-    @GetMapping
-    public Mono<PersonalChatResponseDto> getPersonalChat(@RequestParam(name = "username") String username1,
+    @GetMapping("/{username}")
+    public Mono<PersonalChatResponseDto> getPersonalChat(@PathVariable(name = "username") String username1,
                                                          @RequestHeader("USERNAME") String username2) {
         return service.getChat(username1, username2);
     }

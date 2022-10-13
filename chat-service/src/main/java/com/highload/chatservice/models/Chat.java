@@ -10,7 +10,6 @@ import java.util.UUID;
 @Table(name = "chat")
 @Inheritance(strategy = InheritanceType.JOINED)
 @NoArgsConstructor
-@Builder
 @Data
 @AllArgsConstructor
 public class Chat {
