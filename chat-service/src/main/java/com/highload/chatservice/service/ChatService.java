@@ -9,6 +9,4 @@ public interface ChatService {
 
     Mono<Void> authorizeOperation(UUID chatId, UUID personId, ChatOperation operation);
 
-    Mono<Void> authorizeOperation(UUID chatId, String username, ChatOperation operation);
-
 }

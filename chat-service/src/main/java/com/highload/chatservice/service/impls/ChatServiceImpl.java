@@ -13,7 +13,6 @@ import com.highload.chatservice.service.ChatService;
 import com.highload.chatservice.service.GroupService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
@@ -42,22 +41,18 @@ public class ChatServiceImpl implements ChatService {
                 });
     }
 
-    public Mono<Void> authorizeOperation(UUID chatId, String username, ChatOperation operation) {
-        return personFeignClient.getPerson(username)
-                .flatMap(person ->
-                        this.authorizeOperation(chatId, person.getId(), operation)
-                );
-    }
-
     private Mono<Void> authorizeInPersonalChat(UUID personId, PersonalChat personalChat, ChatOperation operation) {
-        Mono<PersonResponseDto> person1 = personFeignClient.getPerson(personalChat.getPerson1Id());
-        Mono<PersonResponseDto> person2 = personFeignClient.getPerson(personalChat.getPerson2Id());
-
-        return Flux.concat(person1, person2)
+        Mono<PersonResponseDto> person1 = personFeignClient.getPerson(personalChat.getPerson1Id())
                 .filter(person -> !person.isDeleted() || operation == ChatOperation.READ)
-                .switchIfEmpty(Mono.error(InvalidRequestException::new))
-                .filter(person -> personId.equals(person.getId()))
-                .switchIfEmpty(Mono.error(IllegalAccessException::new))
+                .switchIfEmpty(Mono.error(new InvalidRequestException()));
+        Mono<PersonResponseDto> person2 = personFeignClient.getPerson(personalChat.getPerson2Id())
+                .filter(person -> !person.isDeleted() || operation == ChatOperation.READ)
+                .switchIfEmpty(Mono.error(new InvalidRequestException()));
+        return person1.zipWith(person2)
+                .filter(tuple -> personalChat.getPerson1Id().equals(personId) ||
+                        personalChat.getPerson2Id().equals(personId))
+                .switchIfEmpty(Mono.error(new IllegalAccessException()))
                 .then();
     }
+
 }

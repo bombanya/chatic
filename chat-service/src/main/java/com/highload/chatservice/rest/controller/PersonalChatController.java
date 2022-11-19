@@ -18,24 +18,23 @@ public class PersonalChatController {
     private final PersonalChatService service;
 
     @GetMapping("/{username}")
-    public Mono<PersonalChatResponseDto> getPersonalChat(@PathVariable(name = "username") String username1,
+    public Mono<PersonalChatResponseDto> getPersonalChat(@PathVariable("username") String username1,
                                                          @RequestHeader("USERNAME") String username2) {
         return service.getChat(username1, username2);
     }
 
     @GetMapping
-    public Mono<PageResponseDto<PersonalChat>> getPersonalChats(@RequestParam int page,
-                                                                @RequestParam int size,
+    public Mono<PageResponseDto<PersonalChat>> getPersonalChats(@RequestParam(defaultValue = "0", required = false) int page,
+                                                                @RequestParam(defaultValue = "10", required = false) int size,
                                                                 @RequestHeader("USERNAME") String username) {
         return service.getAllChats(username, PageRequest.of(page, size));
     }
 
-    @PostMapping
+    @PostMapping("/{username}")
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<PersonalChatResponseDto> addPersonalChat(@RequestParam(name = "username") String username1,
+    public Mono<PersonalChatResponseDto> addPersonalChat(@PathVariable("username") String username1,
                                                          @RequestHeader("USERNAME") String username2) {
         return service.addChat(username1, username2);
     }
-
 
 }

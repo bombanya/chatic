@@ -114,7 +114,7 @@ public class MessageServiceImpl implements MessageService {
                         chatClient.authorizeOperation(
                                 tuple.getT2().getChatId(),
                                 tuple.getT1().getId(), ChatOperation.READ))
-                .flatMap(x -> message)
+                .then(message)
                 .zipWith(messageContentRepository.findByMessageId(messageId)
                         .switchIfEmpty(Mono.error(new ResourceNotFoundException())))
                 .map(tuple -> MessageResponseDto.fromMessageWithContent(tuple.getT1(), tuple.getT2()));

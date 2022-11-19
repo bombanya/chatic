@@ -14,6 +14,6 @@ class FallbackChat implements ChatFeignClient {
     public Mono<Void> authorizeOperation(UUID chatId,
                                          UUID personId,
                                          ChatOperation operation) {
-        throw new NoFallbackAvailableException("Person-client not available", new RuntimeException());
+        return Mono.error(new NoFallbackAvailableException("Person-client not available", new RuntimeException()));
     }
 }

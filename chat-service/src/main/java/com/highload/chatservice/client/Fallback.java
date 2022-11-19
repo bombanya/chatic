@@ -12,12 +12,12 @@ class Fallback implements PersonFeignClient {
 
     @Override
     public Mono<PersonResponseDto> getPerson(String username) {
-        throw new NoFallbackAvailableException("Person-client not available", new RuntimeException());
+        return Mono.error(new NoFallbackAvailableException("Person-client not available", new RuntimeException()));
     }
 
     @Override
     public Mono<PersonResponseDto> getPerson(UUID userId) {
-        throw new NoFallbackAvailableException("Person-client not available", new RuntimeException());
+        return Mono.error(new NoFallbackAvailableException("Person-client not available", new RuntimeException()));
     }
 
 }

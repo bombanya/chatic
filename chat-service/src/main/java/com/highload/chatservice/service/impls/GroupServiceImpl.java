@@ -8,7 +8,6 @@ import com.highload.chatservice.dto.group.GroupMemberResponseDto;
 import com.highload.chatservice.dto.group.GroupRequestDto;
 import com.highload.chatservice.dto.group.GroupResponseDto;
 import com.highload.chatservice.exception.IllegalAccessException;
-import com.highload.chatservice.exception.InvalidRequestException;
 import com.highload.chatservice.exception.ResourceNotFoundException;
 import com.highload.chatservice.models.*;
 import com.highload.chatservice.repository.GroupMemberRepository;
@@ -76,8 +75,9 @@ public class GroupServiceImpl implements GroupService {
                         .flatMap(person ->
                                 authorizeOperation(groupId, person.getId(), ChatOperation.READ));
 
-
-        return authorizeReadOperation.map(groupMember -> modelMapper.map(groupMember, GroupMemberResponseDto.class));
+        return authorizeReadOperation
+                .then(getGroupMember(groupId, personId))
+                .map(groupMember -> modelMapper.map(groupMember, GroupMemberResponseDto.class));
     }
 
     @Override
@@ -89,9 +89,9 @@ public class GroupServiceImpl implements GroupService {
 
         Mono<GroupMemberResponseDto> createGroupMember =
                 getMember(username, groupId, groupMemberRequestDto.getPersonId())
-                        .switchIfEmpty(createGroupMember(groupId, groupMemberRequestDto)
-                                .map(this::groupMemberToResponseDto))
-                        .then(Mono.error(InvalidRequestException::new));
+                        .onErrorResume(ResourceNotFoundException.class, e ->
+                                createGroupMember(groupId, groupMemberRequestDto)
+                                        .map(this::groupMemberToResponseDto));
 
         return authorizeManageGroupOp.then(createGroupMember);
     }
@@ -103,28 +103,13 @@ public class GroupServiceImpl implements GroupService {
                         .flatMap(person ->
                                 authorizeOperation(groupId, person.getId(), ChatOperation.MANAGE));
 
-        return authorizeManageGroupOp.then(
-                        Mono.fromCallable(() -> {
-                                    GroupMemberId memberId = GroupMemberId.builder()
-                                            .personId(requestDto.getPersonId())
-                                            .pgroupId(groupId)
-                                            .build();
-
-                                    GroupMember groupMember =
-                                            groupMemberRepository.findById(memberId)
-                                                    .orElseThrow(ResourceNotFoundException::new);
-
-                                    groupMember.setRole(GroupRole.builder()
-                                            .id(groupMember.getRole().getId())
-                                            .manageMembers(requestDto.isManageMembers())
-                                            .writePosts(requestDto.isWritePosts())
-                                            .writeComments(requestDto.isWriteComments())
-                                            .build());
-
-                                    return groupMember;
-                                }
-                        ).subscribeOn(Schedulers.boundedElastic())
-                ).flatMap(groupMember -> saveGroupRole(groupMember.getRole()).and(saveGroupMember(groupMember)))
+        return authorizeManageGroupOp.then(getGroupMember(groupId, requestDto.getPersonId()))
+                .zipWith(getGroupRole(requestDto))
+                .map(tuple -> {
+                    tuple.getT1().setRole(tuple.getT2());
+                    return tuple.getT1();
+                })
+                .flatMap(this::saveGroupMember)
                 .then();
     }
 
@@ -136,14 +121,12 @@ public class GroupServiceImpl implements GroupService {
                                 authorizeOperation(groupId, person.getId(), ChatOperation.MANAGE));
 
         Mono<Void> deleteMember =
-                Mono.fromCallable(() -> {
-                                    GroupMemberId id = new GroupMemberId(groupId, personId);
-                                    if (!groupMemberRepository.existsById(new GroupMemberId(groupId, personId)))
-                                        throw new ResourceNotFoundException();
-                                    groupMemberRepository.deleteById(id);
-                                    return null;
-                                }
-                        ).subscribeOn(Schedulers.boundedElastic())
+                getGroupMember(groupId, personId)
+                        .flatMap(groupMember -> Mono.fromCallable(() -> {
+                            groupMemberRepository.deleteById(groupMember.getGroupMemberId());
+                            return null;
+                        }
+                        ).subscribeOn(Schedulers.boundedElastic()))
                         .then();
 
         return authorizeManageGroupOp.then(deleteMember);
@@ -195,13 +178,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     private Mono<GroupMember> createGroupMember(UUID groupId, GroupMemberRequestDto requestDto) {
-        GroupRole newRole = GroupRole.builder()
-                .manageMembers(requestDto.isManageMembers())
-                .writePosts(requestDto.isWritePosts())
-                .writeComments(requestDto.isWriteComments())
-                .build();
-
-        return saveGroupRole(newRole).flatMap(role -> {
+        return getGroupRole(requestDto).flatMap(role -> {
             GroupMemberId memberId = GroupMemberId.builder()
                     .personId(requestDto.getPersonId())
                     .pgroupId(groupId)
@@ -231,8 +208,17 @@ public class GroupServiceImpl implements GroupService {
                 .subscribeOn(Schedulers.boundedElastic());
     }
 
-    private Mono<GroupRole> saveGroupRole(GroupRole groupRole) {
-        return Mono.fromCallable(() -> groupRoleRepository.save(groupRole))
+    private Mono<GroupRole> getGroupRole(GroupMemberRequestDto requestDto) {
+        return Mono.fromCallable(() -> groupRoleRepository.
+                findByWritePostsAndWriteCommentsAndManageMembers(requestDto.isWritePosts(),
+                        requestDto.isWriteComments(),
+                        requestDto.isManageMembers())
+                .orElseGet(() -> groupRoleRepository.save(GroupRole
+                        .builder()
+                        .writePosts(requestDto.isWritePosts())
+                        .writeComments(requestDto.isWriteComments())
+                        .manageMembers(requestDto.isManageMembers())
+                        .build())))
                 .subscribeOn(Schedulers.boundedElastic());
     }
 

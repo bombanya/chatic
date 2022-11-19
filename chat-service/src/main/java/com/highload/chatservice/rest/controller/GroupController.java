@@ -34,24 +34,23 @@ public class GroupController {
     }
 
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
     public Mono<PageResponseDto<GroupResponseDto>> getAllGroups(@RequestHeader("USERNAME") String username,
-                                               @RequestParam(defaultValue = "0") int page,
-                                               @RequestParam(defaultValue = "10") int size) {
+                                               @RequestParam(defaultValue = "0", required = false) int page,
+                                               @RequestParam(defaultValue = "10", required = false) int size) {
         return service.getAllGroups(username, PageRequest.of(page, size));
     }
 
     @GetMapping("/{groupId}/members")
-    @ResponseStatus(HttpStatus.OK)
-    public Mono<PageResponseDto<GroupMemberResponseDto>> getMembers(@RequestParam(defaultValue = "0") int page,
-                                                                    @RequestParam(defaultValue = "10") int size,
+    public Mono<PageResponseDto<GroupMemberResponseDto>> getMembers(@RequestParam(defaultValue = "0", required = false)
+                                                                        int page,
+                                                                    @RequestParam(defaultValue = "10", required = false)
+                                                                        int size,
                                                                     @PathVariable UUID groupId,
                                                                     @RequestHeader("USERNAME") String username) {
         return service.getMembers(username, groupId, PageRequest.of(page, size));
     }
 
     @GetMapping("/{groupId}/members/{personId}")
-    @ResponseStatus(HttpStatus.OK)
     public Mono<GroupMemberResponseDto> getMember(@PathVariable UUID groupId,
                                                   @PathVariable UUID personId,
                                                   @RequestHeader("USERNAME") String username) {
@@ -67,7 +66,6 @@ public class GroupController {
     }
 
     @PutMapping("/{groupId}/members")
-    @ResponseStatus(HttpStatus.OK)
     public Mono<Void> updateMember(@RequestBody @Valid GroupMemberRequestDto groupMemberRequestDto,
                                    @PathVariable UUID groupId,
                                    @RequestHeader("USERNAME") String username) {
@@ -75,7 +73,6 @@ public class GroupController {
     }
 
     @DeleteMapping("/{groupId}/members/{personId}")
-    @ResponseStatus(HttpStatus.OK)
     public Mono<Void> deleteMember(@PathVariable UUID groupId,
                                    @PathVariable UUID personId,
                                    @RequestHeader("USERNAME") String username) {
