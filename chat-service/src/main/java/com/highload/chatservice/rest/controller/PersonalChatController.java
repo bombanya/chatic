@@ -2,7 +2,6 @@ package com.highload.chatservice.rest.controller;
 
 import com.highload.chatservice.dto.PageResponseDto;
 import com.highload.chatservice.dto.personalchat.PersonalChatResponseDto;
-import com.highload.chatservice.models.PersonalChat;
 import com.highload.chatservice.service.PersonalChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -24,7 +23,7 @@ public class PersonalChatController {
     }
 
     @GetMapping
-    public Mono<PageResponseDto<PersonalChat>> getPersonalChats(@RequestParam(defaultValue = "0", required = false) int page,
+    public Mono<PageResponseDto<PersonalChatResponseDto>> getPersonalChats(@RequestParam(defaultValue = "0", required = false) int page,
                                                                 @RequestParam(defaultValue = "10", required = false) int size,
                                                                 @RequestHeader("USERNAME") String username) {
         return service.getAllChats(username, PageRequest.of(page, size));

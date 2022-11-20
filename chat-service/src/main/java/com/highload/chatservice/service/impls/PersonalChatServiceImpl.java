@@ -56,12 +56,14 @@ public class PersonalChatServiceImpl implements PersonalChatService {
     }
 
     @Override
-    public Mono<PageResponseDto<PersonalChat>> getAllChats(String username, Pageable pageable) {
+    public Mono<PageResponseDto<PersonalChatResponseDto>> getAllChats(String username, Pageable pageable) {
         var user = personClient.getPerson(username);
         return user.flatMap(personResponseDto ->
                 Mono.fromCallable(() ->
                         personalChatRepository.findAllUserChats(personResponseDto.getId(), pageable)
-                ).subscribeOn(Schedulers.boundedElastic())
-        ).map(PageResponseDto::new);
+                ).subscribeOn(Schedulers.boundedElastic()))
+                .map(page -> page.map(personalChat
+                        -> modelMapper.map(personalChat, PersonalChatResponseDto.class)))
+                .map(PageResponseDto::new);
     }
 }

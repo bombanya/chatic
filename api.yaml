@@ -93,6 +93,287 @@ paths:
         "200":
           description: OK
 
+
+  /auth/{chatId}/{personId}/{operation}:
+    post:
+      summary: Authorize user on message operation
+      tags:
+        - chats-auth-controller
+      operationId: authorizeOperation
+      parameters:
+        - name: chatId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: personId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: operation
+          in: path
+          required: true
+          schema:
+            type: string
+            enum:
+              - WRITE
+              - REPLY
+              - READ
+              - MANAGE
+      responses:
+        "200":
+          description: OK
+
+  /personal-chats/{username}:
+    get:
+      summary: Get info about personal chat with user
+      tags:
+        - personal-chat-controller
+      operationId: getPersonalChat
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonalChatResponseDto'
+    post:
+      summary: Create personal chat with user
+      tags:
+        - personal-chat-controller
+      operationId: addPersonalChat
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonalChatResponseDto'
+  /personal-chats:
+    get:
+      summary: Get all personal chats (pageable)
+      tags:
+        - personal-chat-controller
+      operationId: getPersonalChats
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 10
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageResponseDtoPersonalChatResponseDto'
+
+  /groups:
+    get:
+      summary: Get all groups (pageable)
+      tags:
+        - group-controller
+      operationId: getAllGroups
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 10
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageResponseDtoGroupResponseDto'
+    post:
+      summary: Create new group
+      description: User will be added to the group with all permissions
+      tags:
+        - group-controller
+      operationId: addGroup
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GroupRequestDto'
+        required: true
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupResponseDto'
+
+  /groups/{groupId}/members:
+    get:
+      summary: Get all group members (pageable)
+      description: READ permission
+      tags:
+        - group-controller
+      operationId: getMembers
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 10
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageResponseDtoGroupMemberResponseDto'
+    put:
+      summary: Update group member permissions
+      description: MANAGE permission
+      tags:
+        - group-controller
+      operationId: updateMember
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GroupMemberRequestDto'
+        required: true
+      responses:
+        "200":
+          description: OK
+    post:
+      summary: Add new member to the group
+      description: MANAGE permission
+      tags:
+        - group-controller
+      operationId: addMember
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GroupMemberRequestDto'
+        required: true
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupMemberResponseDto'
+  /groups/{groupId}/members/{personId}:
+    get:
+      summary: Get group member info
+      description: READ permission
+      tags:
+        - group-controller
+      operationId: getMember
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: personId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupMemberResponseDto'
+    delete:
+      summary: Delete group member from group
+      description: MANAGE permission
+      tags:
+        - group-controller
+      operationId: deleteMember
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: personId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: OK
+
 security:
   - jwtAuth : []
 
@@ -151,3 +432,116 @@ components:
           type: string
         authRole:
           type: string
+    PersonalChatResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        person1Id:
+          type: string
+          format: uuid
+        person2Id:
+          type: string
+          format: uuid
+    PageResponseDtoPersonalChatResponseDto:
+      type: object
+      properties:
+        page:
+          type: array
+          items:
+            $ref: '#/components/schemas/PersonalChatResponseDto'
+        hasNext:
+          type: boolean
+        currentPage:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+        totalPages:
+          type: integer
+          format: int32
+    GroupMemberRequestDto:
+      required:
+        - personId
+        - writePosts
+        - writeComments
+        - manageMembers
+      type: object
+      properties:
+        personId:
+          type: string
+          format: uuid
+        writePosts:
+          type: boolean
+        writeComments:
+          type: boolean
+        manageMembers:
+          type: boolean
+    GroupRequestDto:
+      required:
+        - name
+      type: object
+      properties:
+        name:
+          type: string
+    GroupResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+    GroupMemberResponseDto:
+      type: object
+      properties:
+        groupId:
+          type: string
+          format: uuid
+        personId:
+          type: string
+          format: uuid
+        writePosts:
+          type: boolean
+        writeComments:
+          type: boolean
+        manageMembers:
+          type: boolean
+    PageResponseDtoGroupResponseDto:
+      type: object
+      properties:
+        page:
+          type: array
+          items:
+            $ref: '#/components/schemas/GroupResponseDto'
+        hasNext:
+          type: boolean
+        currentPage:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+        totalPages:
+          type: integer
+          format: int32
+    PageResponseDtoGroupMemberResponseDto:
+      type: object
+      properties:
+        page:
+          type: array
+          items:
+            $ref: '#/components/schemas/GroupMemberResponseDto'
+        hasNext:
+          type: boolean
+        currentPage:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+        totalPages:
+          type: integer
+          format: int32
