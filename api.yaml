@@ -1,0 +1,153 @@
+openapi: 3.0.1
+info:
+  title: Chatic app
+  version: 1.0.0
+servers:
+  - url: http://labvm-42-22.itmo-lab.cosm-lab.science:8080
+    description: Common gateway
+paths:
+  /login:
+    post:
+      summary: Login to get your token
+      tags:
+        - person-controller
+      operationId: login
+      security:
+        - basicAuth : []
+      responses:
+        "200":
+          description: OK
+          headers:
+            Authorization:
+              schema:
+                type: string
+                format: jwt
+                description: token
+  /persons:
+    post:
+      summary: Create new user (admin)
+      tags:
+        - person-controller
+      operationId: addPerson
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonRequestDtoAdd'
+        required: true
+      responses:
+        "201":
+          description: Created
+  /persons/byusername/{username}:
+    get:
+      summary: Get user info by username
+      tags:
+        - person-controller
+      operationId: getPersonUsername
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json':
+              schema:
+                $ref: '#/components/schemas/PersonResponseDto'
+  /persons/byid/{userId}:
+    get:
+      summary: Get user info by id
+      tags:
+        - person-controller
+      operationId: getPersonId
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonResponseDto'
+  /persons/{username}:
+    delete:
+      summary: Delete user (admin and user itself)
+      tags:
+        - person-controller
+      operationId: deletePerson
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+
+security:
+  - jwtAuth : []
+
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: jwt
+
+  schemas:
+    PersonRequestDtoAdd:
+      required:
+        - authRole
+        - password
+        - username
+      type: object
+      properties:
+        username:
+          maxLength: 20
+          minLength: 2
+          type: string
+        password:
+          type: string
+          minLength: 1
+        bio:
+          maxLength: 70
+          minLength: 0
+          type: string
+        authRole:
+          type: string
+          enum:
+            - ADMIN
+            - USER
+    PersonResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        username:
+          type: string
+        bio:
+          type: string
+        deleted:
+          type: boolean
+    PersonAuthDto:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        authRole:
+          type: string

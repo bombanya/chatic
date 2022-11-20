@@ -1,0 +1,154 @@
+openapi: 3.0.1
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+  - url: http://localhost:53979
+    description: Generated server url
+paths:
+  /persons:
+    post:
+      operationId: addPerson
+      parameters:
+        - name: ROLE
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonRequestDto'
+        required: true
+      responses:
+        "201":
+          description: Created
+  /persons/byusername/{username}:
+    get:
+      tags:
+        - person-controller
+      operationId: getPerson
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PersonResponseDto'
+  /persons/byid/{userId}:
+    get:
+      tags:
+        - person-controller
+      operationId: getPerson_1
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PersonResponseDto'
+  /persons-auth/{username}:
+    get:
+      tags:
+        - auth-controller
+      operationId: getPerson_2
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PersonAuthDto'
+  /persons/{username}:
+    delete:
+      tags:
+        - person-controller
+      operationId: deletePerson
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: ROLE
+          in: header
+          required: true
+          schema:
+            type: string
+        - name: USERNAME
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+components:
+  schemas:
+    PersonRequestDto:
+      required:
+        - authRole
+        - id
+        - password
+        - username
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        username:
+          maxLength: 20
+          minLength: 2
+          type: string
+        password:
+          type: string
+        bio:
+          maxLength: 70
+          minLength: 0
+          type: string
+        authRole:
+          type: string
+          enum:
+            - ADMIN
+            - USER
+    PersonResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        username:
+          type: string
+        bio:
+          type: string
+        deleted:
+          type: boolean
+    PersonAuthDto:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        authRole:
+          type: string
