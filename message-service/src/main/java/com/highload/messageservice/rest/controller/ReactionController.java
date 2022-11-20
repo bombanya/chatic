@@ -1,10 +1,10 @@
 package com.highload.messageservice.rest.controller;
 
+import com.highload.messageservice.dto.PageResponseDto;
 import com.highload.messageservice.dto.reaction.ReactionRequestDto;
 import com.highload.messageservice.dto.reaction.ReactionResponseDto;
 import com.highload.messageservice.service.ReactionService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -21,10 +21,10 @@ public class ReactionController {
     private final ReactionService service;
 
     @GetMapping
-    public Mono<PageImpl<ReactionResponseDto>> getReactions(@PathVariable UUID messageId,
-                                                            @RequestParam(defaultValue = "0", required = false) int page,
-                                                            @RequestParam(defaultValue = "20" ,required = false) int size,
-                                                            @RequestHeader("USERNAME") String username) {
+    public Mono<PageResponseDto<ReactionResponseDto>> getReactions(@PathVariable UUID messageId,
+                                                                   @RequestParam(defaultValue = "0", required = false) int page,
+                                                                   @RequestParam(defaultValue = "20" ,required = false) int size,
+                                                                   @RequestHeader("USERNAME") String username) {
         return service.getReactions(username, messageId, PageRequest.of(page, size));
     }
 

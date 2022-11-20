@@ -1,9 +1,9 @@
 package com.highload.messageservice.service;
 
+import com.highload.messageservice.dto.PageResponseDto;
 import com.highload.messageservice.dto.message.MessageRequestDto;
 import com.highload.messageservice.dto.message.MessageResponseDto;
 import com.highload.messageservice.models.ChatOperation;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import reactor.core.publisher.Mono;
 
@@ -21,9 +21,9 @@ public interface MessageService {
 
     Mono<MessageResponseDto> getMessage(String username, UUID messageId);
 
-    Mono<PageImpl<MessageResponseDto>> getChatMessages(String username, UUID chatId, Pageable pageable);
+    Mono<PageResponseDto<MessageResponseDto>> getChatMessages(String username, UUID chatId, Pageable pageable);
 
-    Mono<PageImpl<MessageResponseDto>> getMessageReplies(String username, UUID messageId, Pageable pageable);
+    Mono<PageResponseDto<MessageResponseDto>> getMessageReplies(String username, UUID messageId, Pageable pageable);
 
     Mono<Void> authorizeOperationOnMessage(UUID messageId, UUID personId, ChatOperation operation);
 }

@@ -2,6 +2,7 @@ package com.highload.messageservice.service.impls;
 
 import com.highload.messageservice.client.ChatFeignClient;
 import com.highload.messageservice.client.PersonFeignClient;
+import com.highload.messageservice.dto.PageResponseDto;
 import com.highload.messageservice.dto.message.MessageRequestDto;
 import com.highload.messageservice.dto.message.MessageResponseDto;
 import com.highload.messageservice.exception.IllegalAccessException;
@@ -13,7 +14,6 @@ import com.highload.messageservice.repository.MessageContentRepository;
 import com.highload.messageservice.repository.MessageRepository;
 import com.highload.messageservice.service.MessageService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -122,7 +122,7 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public Mono<PageImpl<MessageResponseDto>> getChatMessages(String username, UUID chatId, Pageable pageable) {
+    public Mono<PageResponseDto<MessageResponseDto>> getChatMessages(String username, UUID chatId, Pageable pageable) {
         var messages =
                 personClient.getPerson(username)
                         .flatMap(personResponseDto ->
@@ -138,11 +138,11 @@ public class MessageServiceImpl implements MessageService {
                 .map(tuple -> MessageResponseDto.fromMessagesWithContent(tuple.getT1(), tuple.getT2()))
                 .zipWith(messageRepository.countByChatId(chatId)
                         .switchIfEmpty(Mono.error(new ResourceNotFoundException())))
-                .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
+                .map(tuple -> new PageResponseDto<>(tuple.getT1(), pageable, tuple.getT2()));
     }
 
     @Override
-    public Mono<PageImpl<MessageResponseDto>> getMessageReplies(String username, UUID messageId, Pageable pageable) {
+    public Mono<PageResponseDto<MessageResponseDto>> getMessageReplies(String username, UUID messageId, Pageable pageable) {
         var person = personClient.getPerson(username);
         var message = messageRepository.findById(messageId);
         var replies = person.zipWith(message)
@@ -161,7 +161,7 @@ public class MessageServiceImpl implements MessageService {
                 .map(tuple -> MessageResponseDto.fromMessagesWithContent(tuple.getT1(), tuple.getT2()))
                 .zipWith(messageRepository.countByReplyId(messageId)
                         .switchIfEmpty(Mono.error(new ResourceNotFoundException())))
-                .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
+                .map(tuple -> new PageResponseDto<>(tuple.getT1(), pageable, tuple.getT2()));
     }
 
     @Override

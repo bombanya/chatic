@@ -1,6 +1,7 @@
 package com.highload.messageservice.service.impls;
 
 import com.highload.messageservice.client.PersonFeignClient;
+import com.highload.messageservice.dto.PageResponseDto;
 import com.highload.messageservice.dto.reaction.ReactionRequestDto;
 import com.highload.messageservice.dto.reaction.ReactionResponseDto;
 import com.highload.messageservice.models.ChatOperation;
@@ -10,7 +11,6 @@ import com.highload.messageservice.service.MessageService;
 import com.highload.messageservice.service.ReactionService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -61,7 +61,7 @@ public class ReactionServiceImpl implements ReactionService {
     }
 
     @Override
-    public Mono<PageImpl<ReactionResponseDto>> getReactions(String username, UUID messageId, Pageable pageable) {
+    public Mono<PageResponseDto<ReactionResponseDto>> getReactions(String username, UUID messageId, Pageable pageable) {
         return personClient.getPerson(username)
                 .flatMap(personResponseDto ->
                         messageService.authorizeOperationOnMessage(messageId,
@@ -70,6 +70,6 @@ public class ReactionServiceImpl implements ReactionService {
                 .map(reaction -> modelMapper.map(reaction, ReactionResponseDto.class))
                 .collectList()
                 .zipWith(reactionRepository.countByMessageId(messageId))
-                .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
+                .map(tuple -> new PageResponseDto<>(tuple.getT1(), pageable, tuple.getT2()));
     }
 }

@@ -1,10 +1,10 @@
 package com.highload.messageservice.rest.controller;
 
+import com.highload.messageservice.dto.PageResponseDto;
 import com.highload.messageservice.dto.message.MessageRequestDto;
 import com.highload.messageservice.dto.message.MessageResponseDto;
 import com.highload.messageservice.service.MessageService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -55,15 +55,15 @@ public class MessageController {
     }
 
     @GetMapping
-    public Mono<PageImpl<MessageResponseDto>> getMessages(@RequestParam UUID chatId,
-                                                          @RequestParam(defaultValue = "0", required = false) int page,
-                                                          @RequestParam(defaultValue = "10", required = false) int size,
-                                                          @RequestHeader("USERNAME") String username) {
+    public Mono<PageResponseDto<MessageResponseDto>> getMessages(@RequestParam UUID chatId,
+                                                                 @RequestParam(defaultValue = "0", required = false) int page,
+                                                                 @RequestParam(defaultValue = "10", required = false) int size,
+                                                                 @RequestHeader("USERNAME") String username) {
         return service.getChatMessages(username, chatId, PageRequest.of(page, size));
     }
 
     @GetMapping("/{messageId}/replies")
-    public Mono<PageImpl<MessageResponseDto>> getReplies(@PathVariable UUID messageId,
+    public Mono<PageResponseDto<MessageResponseDto>> getReplies(@PathVariable UUID messageId,
                                                          @RequestParam(defaultValue = "0", required = false) int page,
                                                          @RequestParam(defaultValue = "10", required = false) int size,
                                                          @RequestHeader("USERNAME") String username) {
