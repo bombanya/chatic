@@ -8,6 +8,8 @@
     refs:
       - ci
   image: maven:3.8.6-eclipse-temurin-17
+  tags:
+    - linux
   script:
     - mvn package $MAVEN_CLI_OPTS -f $POM_PATH/pom.xml
   artifacts:
