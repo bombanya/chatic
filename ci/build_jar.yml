@@ -5,7 +5,7 @@ Build Person Service:
   variables:
     POM_PATH: "./person-service"
   extends:
-    .build_jar
+    .build_jar_base
   artifacts:
     paths:
       - person-service/target/person-service-0.0.1-SNAPSHOT.jar

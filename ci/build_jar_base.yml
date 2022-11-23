@@ -1,4 +1,4 @@
-.build_jar:
+.build_jar_base:
   variables:
     MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
     MAVEN_CLI_OPTS: "--batch-mode -DskipTests"
