@@ -2,4 +2,4 @@ stages:
   - Build Jar
 
 include:
-  - local: /ci/*.yml
+  - local: ci/*.yml
