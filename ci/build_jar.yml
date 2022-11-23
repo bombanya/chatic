@@ -1,0 +1,14 @@
+include:
+  - local: '/ci/build_jar_base.yml'
+
+Build Person Service:
+  variables:
+    POM_PATH: "./person-service"
+  extends:
+    .build_jar
+  artifacts:
+    paths:
+      - person-service/target/person-service-0.0.1-SNAPSHOT.jar
+  only:
+    changes:
+      - "person-service/**/*"

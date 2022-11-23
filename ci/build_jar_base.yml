@@ -1,0 +1,17 @@
+.build_jar:
+  variables:
+    MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+    MAVEN_CLI_OPTS: "--batch-mode -DskipTests"
+    POM_PATH: ""
+  stage: Build Jar
+  only:
+    refs:
+      - ci
+  image: maven:3.8.6-eclipse-temurin-17
+  script:
+    - mvn package $MAVEN_CLI_OPTS -f $POM_PATH/pom.xml
+  artifacts:
+    expire_in: 3 hours
+  cache:
+    paths:
+      - .m2/repository

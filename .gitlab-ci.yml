@@ -1,0 +1,5 @@
+stages:
+  - Build Jars
+
+include:
+  - local: '/ci/*.yml'
