@@ -9,7 +9,7 @@
       - ci
   image: maven:3.8.6-eclipse-temurin-17
   tags:
-    - linux
+    - docker
   script:
     - mvn package $MAVEN_CLI_OPTS -f $POM_PATH/pom.xml
   artifacts:
