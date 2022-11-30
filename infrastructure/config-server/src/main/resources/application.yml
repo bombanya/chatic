@@ -1,5 +1,5 @@
 server:
-  port: 8001
+  port: ${CONFIG_PORT:8001}
 
 spring:
   profiles:

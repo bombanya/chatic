@@ -1,0 +1,52 @@
+version: '3.2'
+
+services:
+  postgres:
+    image: postgres:14
+    restart: unless-stopped
+    env_file:
+      - ./.env
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - "${POSTGRES_LOCAL_PORT}:${POSTGRES_DOCKER_PORT}"
+    volumes:
+      - db:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  config:
+    image: ${DOCKER_REGISTRY}/config:develop
+    env_file:
+      - ./.env
+
+  eureka:
+    image: ${DOCKER_REGISTRY}/eureka:develop
+    env_file:
+      - ./.env
+    ports:
+      - "${EUREKA_PORT}:${EUREKA_PORT}"
+
+  gateway:
+    image: ${DOCKER_REGISTRY}/gateway:develop
+    env_file:
+      - ./.env
+    ports:
+      - "${GATEWAY_PORT}:${GATEWAY_PORT}"
+
+  person:
+    image: ${DOCKER_REGISTRY}/person:develop
+    env_file:
+      - ./.env
+
+  message:
+    image: ${DOCKER_REGISTRY}/message:develop
+    env_file:
+      - ./.env
+
+  chat:
+    image: ${DOCKER_REGISTRY}/chat:develop
+    env_file:
+      - ./.env
+
+volumes:
+  db:

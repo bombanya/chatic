@@ -21,3 +21,14 @@ CREATE TABLE Device
     mac    varchar(17) NOT NULL
 );
 --rollback DROP TABLE Device;
+
+--changeset user:3
+INSERT INTO Person (id, username, password, auth_role, bio, deleted)
+VALUES ('c9c8c1fc-7ec0-48e6-be44-46c62d3b5d8a',
+        'admin',
+        '$2a$12$ZZRbkAJnAHYfjDa.CBy7.OjXbIJUESVjqbn0iIAxysDFspu4jrB7u',
+        'ADMIN',
+        null,
+        false
+);
+--rollback delete from person where username = 'admin';
