@@ -14,6 +14,7 @@ import com.highload.messageservice.repository.MessageContentRepository;
 import com.highload.messageservice.repository.MessageRepository;
 import com.highload.messageservice.service.MessageService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MessageServiceImpl implements MessageService {
 
     private final MessageRepository messageRepository;
@@ -33,6 +35,7 @@ public class MessageServiceImpl implements MessageService {
     @Override
     @Transactional
     public Mono<Void> updateMessage(String username, UUID messageID, MessageRequestDto messageRequestDto) {
+        log.info("update message with id {}; username : {}", messageID, username);
         var person = personClient.getPerson(username);
         return person.flatMap(personResponseDto ->
                         checkPersonIsAuthor(personResponseDto.getId(), messageID)
@@ -46,6 +49,7 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public Mono<Void> deleteMessage(String username, UUID messageId) {
+        log.info("delete message with id {}; username: {}", messageId, username);
         return personClient.getPerson(username)
                 .flatMap(personResponseDto -> checkPersonIsAuthor(personResponseDto.getId(), messageId))
                 .then(messageRepository.deleteById(messageId));
@@ -54,6 +58,7 @@ public class MessageServiceImpl implements MessageService {
     @Override
     @Transactional
     public Mono<MessageResponseDto> addMessage(String username, MessageRequestDto messageRequestDto) {
+        log.info("add message - username : {}", username);
         var person = personClient.getPerson(username);
         return person.flatMap(personResponseDto ->
                         chatClient.authorizeOperation(
@@ -79,6 +84,7 @@ public class MessageServiceImpl implements MessageService {
     @Override
     @Transactional
     public Mono<MessageResponseDto> addReply(String username, UUID replyId, MessageRequestDto messageRequestDto) {
+        log.info("add reply for message {}; username {}", replyId, username);
         var person = personClient.getPerson(username);
         return person.flatMap(personResponseDto ->
                         chatClient.authorizeOperation(
@@ -106,6 +112,7 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public Mono<MessageResponseDto> getMessage(String username, UUID messageId) {
+        log.info("get message with id {}; username: {}", messageId, username);
         var person = personClient.getPerson(username);
         var message = messageRepository.findById(messageId)
                 .switchIfEmpty(Mono.error(new ResourceNotFoundException()));
@@ -123,6 +130,8 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public Mono<PageResponseDto<MessageResponseDto>> getChatMessages(String username, UUID chatId, Pageable pageable) {
+        log.info("get message from chat {}; username: {}; page #{}; page len {}", chatId, username,
+                pageable.getPageNumber(), pageable.getPageSize());
         var messages =
                 personClient.getPerson(username)
                         .flatMap(personResponseDto ->
@@ -166,6 +175,7 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public Mono<Void> authorizeOperationOnMessage(UUID messageId, UUID personId, ChatOperation operation) {
+        log.info("authorize operation on message {}; username {}; operation {}", messageId, personId, operation);
         return messageRepository.findById(messageId)
                 .switchIfEmpty(Mono.error(new ResourceNotFoundException()))
                 .map(m -> {

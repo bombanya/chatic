@@ -16,8 +16,13 @@ services:
 
   config:
     image: ${DOCKER_REGISTRY}/config:develop
+    environment:
+      - "SPRING_PROFILES_ACTIVE=native"
     env_file:
       - ./.env
+    labels:
+      collect_logs_with_filebeat: "true"
+      decode_log_event_to_json_object: "true"
 
   eureka:
     image: ${DOCKER_REGISTRY}/eureka:develop
@@ -25,6 +30,9 @@ services:
       - ./.env
     ports:
       - "${EUREKA_PORT}:${EUREKA_PORT}"
+    labels:
+      collect_logs_with_filebeat: "true"
+      decode_log_event_to_json_object: "true"
 
   gateway:
     image: ${DOCKER_REGISTRY}/gateway:develop
@@ -32,21 +40,33 @@ services:
       - ./.env
     ports:
       - "${GATEWAY_PORT}:${GATEWAY_PORT}"
+    labels:
+      collect_logs_with_filebeat: "true"
+      decode_log_event_to_json_object: "true"
 
   person:
     image: ${DOCKER_REGISTRY}/person:develop
     env_file:
       - ./.env
+    labels:
+      collect_logs_with_filebeat: "true"
+      decode_log_event_to_json_object: "true"
 
   message:
     image: ${DOCKER_REGISTRY}/message:develop
     env_file:
       - ./.env
+    labels:
+      collect_logs_with_filebeat: "true"
+      decode_log_event_to_json_object: "true"
 
   chat:
     image: ${DOCKER_REGISTRY}/chat:develop
     env_file:
       - ./.env
+    labels:
+      collect_logs_with_filebeat: "true"
+      decode_log_event_to_json_object: "true"
 
 volumes:
   db:
