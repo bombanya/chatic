@@ -2,6 +2,7 @@
   variables:
     SERVICE_NAME: "dummy"
     DOCKERFILE_PATH: "dummy"
+    SERVICE_NAME_STACK: "dummy"
   stage: Build Containers
   only:
     refs:
@@ -12,4 +13,5 @@
     - echo "$DOCKER_TOKEN" | docker login -u $DOCKER_USER --password-stdin
     - docker build -t $DOCKER_USER/$SERVICE_NAME:develop $DOCKERFILE_PATH
     - docker push $DOCKER_USER/$SERVICE_NAME:develop
+    - ssh -p 4222 $VM "echo $VM_PASSWORD | sudo -S docker service update --force $SERVICE_NAME_STACK"
   when: on_success

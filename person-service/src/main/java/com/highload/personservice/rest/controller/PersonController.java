@@ -47,4 +47,9 @@ public class PersonController {
                              @RequestHeader("USERNAME") String name) {
         personService.deletePerson(username);
     }
+
+    @GetMapping("/test")
+    public String test() {
+        return "Hello, World!";
+    }
 }

@@ -5,6 +5,7 @@ Build Person Container:
   variables:
     SERVICE_NAME: "person-service"
     DOCKERFILE_PATH: "./person-service"
+    SERVICE_NAME_STACK: "stack_person"
   extends: .build_container_base
   dependencies:
     - Build Person Service
@@ -16,6 +17,7 @@ Build Message Container:
   variables:
     SERVICE_NAME: "message-service"
     DOCKERFILE_PATH: "./message-service"
+    SERVICE_NAME_STACK: "stack_message"
   extends: .build_container_base
   dependencies:
     - Build Message Service
@@ -27,6 +29,7 @@ Build Chat Container:
   variables:
     SERVICE_NAME: "chat-service"
     DOCKERFILE_PATH: "./chat-service"
+    SERVICE_NAME_STACK: "stack_chat"
   extends: .build_container_base
   dependencies:
     - Build Chat Service
@@ -38,6 +41,7 @@ Build Config Container:
   variables:
     SERVICE_NAME: "config-server"
     DOCKERFILE_PATH: "./infrastructure/config-server"
+    SERVICE_NAME_STACK: "stack_config"
   extends: .build_container_base
   dependencies:
     - Build Config Server
@@ -49,6 +53,7 @@ Build Eureka Container:
   variables:
     SERVICE_NAME: "eureka-server"
     DOCKERFILE_PATH: "./infrastructure/eureka-server"
+    SERVICE_NAME_STACK: "stack_eureka"
   extends: .build_container_base
   dependencies:
     - Build Eureka
@@ -60,6 +65,7 @@ Build Gateway Container:
   variables:
     SERVICE_NAME: "gateway-server"
     DOCKERFILE_PATH: "./infrastructure/gateway-server"
+    SERVICE_NAME_STACK: "stack_gateway"
   extends: .build_container_base
   dependencies:
     - Build Gateway
