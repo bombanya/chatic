@@ -11,3 +11,58 @@ Build Person Container:
   only:
     changes:
       - "person-service/**/*"
+
+Build Message Container:
+  variables:
+    SERVICE_NAME: "message-service"
+    DOCKERFILE_PATH: "./message-service"
+  extends: .build_container_base
+  dependencies:
+    - Build Message Service
+  only:
+    changes:
+      - "message-service/**/*"
+
+Build Chat Container:
+  variables:
+    SERVICE_NAME: "chat-service"
+    DOCKERFILE_PATH: "./chat-service"
+  extends: .build_container_base
+  dependencies:
+    - Build Chat Service
+  only:
+    changes:
+      - "chat-service/**/*"
+
+Build Config Container:
+  variables:
+    SERVICE_NAME: "config-server"
+    DOCKERFILE_PATH: "./infrastructure/config-server"
+  extends: .build_container_base
+  dependencies:
+    - Build Config Server
+  only:
+    changes:
+      - "infrastructure/config-server/**/*"
+
+Build Eureka:
+  variables:
+    SERVICE_NAME: "eureka-server"
+    DOCKERFILE_PATH: "./infrastructure/eureka-server"
+  extends: .build_container_base
+  dependencies:
+    - Build Eureka
+  only:
+    changes:
+      - "infrastructure/eureka-server/**/*"
+
+Build Gateway:
+  variables:
+    SERVICE_NAME: "gateway-server"
+    DOCKERFILE_PATH: "./infrastructure/gateway-server"
+  extends: .build_container_base
+  dependencies:
+    - Build Gateway
+  only:
+    changes:
+      - "infrastructure/gateway-server/**/*"
