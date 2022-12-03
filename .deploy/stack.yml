@@ -15,7 +15,7 @@ services:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
   config:
-    image: ${DOCKER_REGISTRY}/config:develop
+    image: ${DOCKER_REGISTRY}/config-server:develop
     environment:
       - "SPRING_PROFILES_ACTIVE=native"
     env_file:
@@ -25,7 +25,7 @@ services:
       decode_log_event_to_json_object: "true"
 
   eureka:
-    image: ${DOCKER_REGISTRY}/eureka:develop
+    image: ${DOCKER_REGISTRY}/eureka-server:develop
     env_file:
       - ./.env
     ports:
@@ -35,7 +35,7 @@ services:
       decode_log_event_to_json_object: "true"
 
   gateway:
-    image: ${DOCKER_REGISTRY}/gateway:develop
+    image: ${DOCKER_REGISTRY}/gateway-server:develop
     env_file:
       - ./.env
     ports:
@@ -45,7 +45,7 @@ services:
       decode_log_event_to_json_object: "true"
 
   person:
-    image: ${DOCKER_REGISTRY}/person:develop
+    image: ${DOCKER_REGISTRY}/person-service:develop
     env_file:
       - ./.env
     labels:
@@ -53,7 +53,7 @@ services:
       decode_log_event_to_json_object: "true"
 
   message:
-    image: ${DOCKER_REGISTRY}/message:develop
+    image: ${DOCKER_REGISTRY}/message-service:develop
     env_file:
       - ./.env
     labels:
@@ -61,7 +61,7 @@ services:
       decode_log_event_to_json_object: "true"
 
   chat:
-    image: ${DOCKER_REGISTRY}/chat:develop
+    image: ${DOCKER_REGISTRY}/chat-service:develop
     env_file:
       - ./.env
     labels:
