@@ -1,7 +1,7 @@
 include:
   - local: '/ci/build_jars_base.yml'
 
-Build Person Service:
+Build_Person_Service:
   variables:
     POM_PATH: "./person-service"
   extends:
@@ -13,7 +13,7 @@ Build Person Service:
     changes:
       - "person-service/**/*"
 
-Build Message Service:
+Build_Message_Service:
   variables:
     POM_PATH: "./message-service"
   extends:
@@ -25,7 +25,7 @@ Build Message Service:
     changes:
       - "message-service/**/*"
 
-Build Chat Service:
+Build_Chat_Service:
   variables:
     POM_PATH: "./chat-service"
   extends:
@@ -37,7 +37,7 @@ Build Chat Service:
     changes:
       - "chat-service/**/*"
 
-Build Config Server:
+Build_Config_Server:
   variables:
     POM_PATH: "./infrastructure/config-server"
   extends:
@@ -49,7 +49,7 @@ Build Config Server:
     changes:
       - "infrastructure/config-server/**/*"
 
-Build Eureka:
+Build_Eureka:
   variables:
     POM_PATH: "./infrastructure/eureka-server"
   extends:
@@ -61,7 +61,7 @@ Build Eureka:
     changes:
       - "infrastructure/eureka-server/**/*"
 
-Build Gateway:
+Build_Gateway:
   variables:
     POM_PATH: "./infrastructure/gateway-server"
   extends:

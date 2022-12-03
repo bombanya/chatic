@@ -1,13 +1,13 @@
 include:
   - local: '/ci/build_containers_base.yml'
 
-Build Person Service:
+Build_Person_Service:
   variables:
     SERVICE_NAME: "person-service"
     DOCKERFILE_PATH: "./person-service"
   extends: .build_container_base
   dependencies:
-    - Build Person Service
+    - Build_Person_Service
   only:
     changes:
       - "person-service/**/*"
