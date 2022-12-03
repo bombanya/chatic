@@ -9,7 +9,6 @@
   tags:
     - shell
   script:
-    - echo "$DOCKER_USER"
     - echo "$DOCKER_TOKEN" | docker login -u $DOCKER_USER --password-stdin
     - docker build -t $DOCKER_USER/$SERVICE_NAME:develop $DOCKERFILE_PATH
     - docker push $DOCKER_USER/$SERVICE_NAME:develop
