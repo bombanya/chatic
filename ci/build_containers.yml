@@ -45,7 +45,7 @@ Build Config Container:
     changes:
       - "infrastructure/config-server/**/*"
 
-Build Eureka:
+Build Eureka Container:
   variables:
     SERVICE_NAME: "eureka-server"
     DOCKERFILE_PATH: "./infrastructure/eureka-server"
@@ -56,7 +56,7 @@ Build Eureka:
     changes:
       - "infrastructure/eureka-server/**/*"
 
-Build Gateway:
+Build Gateway Container:
   variables:
     SERVICE_NAME: "gateway-server"
     DOCKERFILE_PATH: "./infrastructure/gateway-server"
