@@ -13,5 +13,5 @@
     - echo "$DOCKER_TOKEN" | docker login -u $DOCKER_USER --password-stdin
     - docker build -t $DOCKER_USER/$SERVICE_NAME:develop $DOCKERFILE_PATH
     - docker push $DOCKER_USER/$SERVICE_NAME:develop
-    - ssh -p 4222 $VM "echo $VM_PASSWORD | sudo -S docker service update --force $SERVICE_NAME_STACK"
+    - ssh -p 4222 $VM "echo $VM_PASSWORD | sudo -S docker pull $DOCKER_USER/$SERVICE_NAME:develop && echo $VM_PASSWORD | sudo -S docker service update --force $SERVICE_NAME_STACK"
   when: on_success

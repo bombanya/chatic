@@ -48,8 +48,8 @@ public class PersonController {
         personService.deletePerson(username);
     }
 
-    @GetMapping("/test")
-    public String test() {
-        return "Hello, World!";
-    }
+//    @GetMapping("/test")
+//    public String test() {
+//        return "Hello, World!";
+//    }
 }
