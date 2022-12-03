@@ -1,0 +1,74 @@
+include:
+  - local: '/ci/build_jars_base.yml'
+
+Build Person Service:
+  variables:
+    POM_PATH: "./person-service"
+  extends:
+    .build_jar_base
+  artifacts:
+    paths:
+      - person-service/target/person-service-0.0.1-SNAPSHOT.jar
+  only:
+    changes:
+      - "person-service/**/*"
+
+Build Message Service:
+  variables:
+    POM_PATH: "./message-service"
+  extends:
+    .build_jar_base
+  artifacts:
+    paths:
+      - message-service/target/message-service-0.0.1-SNAPSHOT.jar
+  only:
+    changes:
+      - "message-service/**/*"
+
+Build Chat Service:
+  variables:
+    POM_PATH: "./chat-service"
+  extends:
+    .build_jar_base
+  artifacts:
+    paths:
+      - chat-service/target/chat-service-0.0.1-SNAPSHOT.jar
+  only:
+    changes:
+      - "chat-service/**/*"
+
+Build Config Server:
+  variables:
+    POM_PATH: "./infrastructure/config-server"
+  extends:
+    .build_jar_base
+  artifacts:
+    paths:
+      - infrastructure/config-server/target/config-server-0.0.1-SNAPSHOT.jar
+  only:
+    changes:
+      - "infrastructure/config-server/**/*"
+
+Build Eureka:
+  variables:
+    POM_PATH: "./infrastructure/eureka-server"
+  extends:
+    .build_jar_base
+  artifacts:
+    paths:
+      - infrastructure/eureka-server/target/eureka-server-0.0.1-SNAPSHOT.jar
+  only:
+    changes:
+      - "infrastructure/eureka-server/**/*"
+
+Build Gateway:
+  variables:
+    POM_PATH: "./infrastructure/gateway-server"
+  extends:
+    .build_jar_base
+  artifacts:
+    paths:
+      - infrastructure/gateway-server/target/gateway-server-0.0.1-SNAPSHOT.jar
+  only:
+    changes:
+      - "infrastructure/gateway-server/**/*"

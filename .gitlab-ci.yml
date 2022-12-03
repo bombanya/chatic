@@ -1,5 +1,6 @@
 stages:
-  - Build Jar
+  - Build Jars
+  - Build Containers
 
 include:
   - local: ci/*.yml

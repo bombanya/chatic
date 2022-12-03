@@ -3,7 +3,7 @@
     MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
     MAVEN_CLI_OPTS: "--batch-mode -DskipTests"
     POM_PATH: ""
-  stage: Build Jar
+  stage: Build Jars
   only:
     refs:
       - ci
