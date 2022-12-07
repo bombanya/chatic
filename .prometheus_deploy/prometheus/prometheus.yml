@@ -72,3 +72,9 @@ scrape_configs:
 
     static_configs:
       - targets: ['node-exporter:9100']
+
+  - job_name: 'micrometer'
+    scrape_interval: 10s
+    metrics_path: '/actuator/prometheus'
+    eureka_sd_configs:
+      - server: http://localhost:8000/eureka
