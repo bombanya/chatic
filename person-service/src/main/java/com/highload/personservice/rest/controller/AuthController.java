@@ -1,5 +1,6 @@
 package com.highload.personservice.rest.controller;
 
+import com.highload.personservice.PersonServiceApplication;
 import com.highload.personservice.dto.person.PersonAuthDto;
 import com.highload.personservice.service.PersonService;
 import io.opentracing.Scope;
@@ -20,14 +21,13 @@ import java.util.Map;
 @RequiredArgsConstructor
 @RequestMapping("/persons-auth")
 public class AuthController {
-    Tracer tracer = GlobalTracer.get();
+    Tracer tracer = PersonServiceApplication.initTracer("person-service-auth");
     private final PersonService personService;
 
     @GetMapping("/{username}")
     public PersonAuthDto getPerson(@PathVariable String username) {
         Span span = tracer.buildSpan("Auth").start();
         try (Scope scope = tracer.scopeManager().activate(span)) {
-            Tags.SPAN_KIND.set(span, Tags.SPAN_KIND_CLIENT);
             Tags.HTTP_METHOD.set(span, "GET");
             return personService.getPersonForAuth(username);
         } catch(Exception ex) {
