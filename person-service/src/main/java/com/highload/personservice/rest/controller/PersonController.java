@@ -4,6 +4,12 @@ import com.highload.personservice.dto.person.PersonRequestDto;
 import com.highload.personservice.dto.person.PersonResponseDto;
 import com.highload.personservice.dto.validation.AddRequest;
 import com.highload.personservice.service.PersonService;
+import io.opentracing.Scope;
+import io.opentracing.Span;
+import io.opentracing.Tracer;
+import io.opentracing.log.Fields;
+import io.opentracing.tag.Tags;
+import io.opentracing.util.GlobalTracer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -11,6 +17,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -18,7 +25,7 @@ import java.util.UUID;
 @Validated
 @RequestMapping("/persons")
 public class PersonController {
-
+    Tracer tracer = GlobalTracer.get();
     private final PersonService personService;
 
     @PostMapping
@@ -50,6 +57,15 @@ public class PersonController {
 
     @GetMapping("/test")
     public String test() {
-        return "Hello, World!";
+        Span span = tracer.buildSpan("test").start();
+        try (Scope scope = tracer.scopeManager().activate(span)) {
+            return "Hello, World!";
+        } catch(Exception ex) {
+            Tags.ERROR.set(span, true);
+            span.log(Map.of(Fields.EVENT, "error", Fields.ERROR_OBJECT, ex, Fields.MESSAGE, ex.getMessage()));
+        } finally {
+            span.finish();
+        }
+        return null;
     }
 }
