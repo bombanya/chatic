@@ -10,3 +10,17 @@ eureka:
     fetch-registry: false
   instance:
     hostname: localhost
+
+management:
+  endpoint:
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  metrics:
+    tags:
+      application: ${spring.application.name}

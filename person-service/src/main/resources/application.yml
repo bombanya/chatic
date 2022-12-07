@@ -20,13 +20,3 @@ person:
     delete-by-id: update person set deleted = true where person.id = :id
     find-by-username-auth: select * from person where person.username = :username and not person.deleted
 
-management:
-  endpoint:
-    metrics:
-      enabled: true
-    prometheus:
-      enabled: true
-  endpoints:
-    web:
-      exposure:
-        include: '*'

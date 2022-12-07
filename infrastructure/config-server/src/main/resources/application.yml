@@ -11,3 +11,17 @@ spring:
           search-locations: classpath:/config
   application:
     name: config-server
+
+management:
+  endpoint:
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  metrics:
+    tags:
+      application: ${spring.application.name}

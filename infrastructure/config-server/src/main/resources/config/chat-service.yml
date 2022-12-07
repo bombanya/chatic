@@ -18,3 +18,17 @@ eureka:
   client:
     service-url:
       defaultZone: http://${EUREKA_HOST:localhost}:${EUREKA_PORT:8000}/eureka
+
+management:
+  endpoint:
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  metrics:
+    tags:
+      application: ${spring.application.name}
