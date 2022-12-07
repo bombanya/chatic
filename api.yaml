@@ -373,6 +373,305 @@ paths:
       responses:
         "200":
           description: OK
+  /messages/{messageId}:
+    get:
+      summary: Get message
+      description: READ permission
+      tags:
+        - message-controller
+      operationId: getMessage
+      parameters:
+        - name: messageId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: USERNAME
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/MessageResponseDto'
+    put:
+      summary: Update your message
+      tags:
+        - message-controller
+      operationId: updateMessage
+      parameters:
+        - name: messageId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: USERNAME
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessageRequestDto'
+        required: true
+      responses:
+        "200":
+          description: OK
+    delete:
+      summary: Delete your message
+      tags:
+        - message-controller
+      operationId: deleteMessage
+      parameters:
+        - name: messageId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: USERNAME
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+  /messages/{messageId}/reactions:
+    get:
+      summary: Get reactions of message
+      description: READ permission
+      tags:
+        - reaction-controller
+      operationId: getReactions
+      parameters:
+        - name: messageId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 20
+        - name: USERNAME
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PageResponseDtoReactionResponseDto'
+    put:
+      summary: Add reaction to message
+      description: READ permission
+      tags:
+        - reaction-controller
+      operationId: addReaction
+      parameters:
+        - name: messageId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: USERNAME
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReactionRequestDto'
+        required: true
+      responses:
+        "201":
+          description: Created
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ReactionResponseDto'
+    delete:
+      summary: Delete your reaction
+      tags:
+        - reaction-controller
+      operationId: deleteReaction
+      parameters:
+        - name: messageId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: USERNAME
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+  /messages:
+    get:
+      summary: Get messages of chat
+      description: READ permission
+      tags:
+        - message-controller
+      operationId: getMessages
+      parameters:
+        - name: chatId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 10
+        - name: USERNAME
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PageResponseDtoMessageResponseDto'
+    post:
+      summary: Add message to chat
+      description: WRITE permission
+      tags:
+        - message-controller
+      operationId: addMessage
+      parameters:
+        - name: USERNAME
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessageRequestDto'
+        required: true
+      responses:
+        "201":
+          description: Created
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/MessageResponseDto'
+  /messages/{messageId}/replies:
+    get:
+      summary: Get replies to a message
+      description: READ permission
+      tags:
+        - message-controller
+      operationId: getReplies
+      parameters:
+        - name: messageId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 10
+        - name: USERNAME
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PageResponseDtoMessageResponseDto'
+    post:
+      summary: Add reply to a message
+      description: REPLY permission
+      tags:
+        - message-controller
+      operationId: addReply
+      parameters:
+        - name: messageId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: USERNAME
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessageRequestDto'
+        required: true
+      responses:
+        "201":
+          description: Created
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/MessageResponseDto'
 
 security:
   - jwtAuth : []
@@ -534,6 +833,96 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/GroupMemberResponseDto'
+        hasNext:
+          type: boolean
+        currentPage:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+        totalPages:
+          type: integer
+          format: int32
+    MessageRequestDto:
+      required:
+        - chatId
+        - textContent
+      type: object
+      properties:
+        textContent:
+          type: string
+        chatId:
+          type: string
+          format: uuid
+    ReactionRequestDto:
+      required:
+        - emoji
+      type: object
+      properties:
+        emoji:
+          type: string
+          enum:
+            - POO
+            - CLOWN
+            - LIKE
+    ReactionResponseDto:
+      type: object
+      properties:
+        personId:
+          type: string
+          format: uuid
+        emoji:
+          type: string
+          enum:
+            - POO
+            - CLOWN
+            - LIKE
+    MessageResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        chatId:
+          type: string
+          format: uuid
+        authorId:
+          type: string
+          format: uuid
+        timestamp:
+          type: string
+          format: date-time
+        replyId:
+          type: string
+          format: uuid
+        textContent:
+          type: string
+    PageResponseDtoMessageResponseDto:
+      type: object
+      properties:
+        page:
+          type: array
+          items:
+            $ref: '#/components/schemas/MessageResponseDto'
+        hasNext:
+          type: boolean
+        currentPage:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+        totalPages:
+          type: integer
+          format: int32
+    PageResponseDtoReactionResponseDto:
+      type: object
+      properties:
+        page:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReactionResponseDto'
         hasNext:
           type: boolean
         currentPage:
